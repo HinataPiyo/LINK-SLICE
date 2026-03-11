@@ -1,0 +1,34 @@
+{
+    "name": "Player",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "ee5d9f18-34ab-40d8-8bd2-465ef9a4681c",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "59a86d6d-08c2-48bc-b785-8c1b9ccebd0a",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cb68b255-cfde-4a2d-9b63-4b74f78f8e92",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
