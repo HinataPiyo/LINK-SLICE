@@ -1,5 +1,6 @@
 namespace Player.Link
 {
+    using Common;
     using NUnit.Framework.Constraints;
     using UnityEngine;
 
@@ -132,8 +133,18 @@ namespace Player.Link
 
             if (hit.collider != null)
             {
-                Debug.Log($"Hit: {hit.collider.name}");
+                Health targetHealth = hit.collider.GetComponent<Health>();
+                if (targetHealth == null) return;
+                OnAttack(targetHealth);
             }
+        }
+
+        /// <summary>
+        /// 攻撃処理。Healthコンポーネントを持つオブジェクトに対してダメージを与える
+        /// </summary>
+        void OnAttack(Health targetHealth)
+        {
+            targetHealth.TakeDamage(1);
         }
     }
 }
