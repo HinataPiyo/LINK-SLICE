@@ -5001,7 +5001,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62b3013291fe1a9499eb21aeab2ffe3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 1198806684681842532}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
   maxLineWidth: 0.15
   growDuration: 0.2
   shrinkDuration: 0.3
