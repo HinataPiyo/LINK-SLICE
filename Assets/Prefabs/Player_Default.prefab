@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2782982525101034354}
   m_Layer: 0
   m_Name: Player_Default
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 713393067
+  GlobalObjectIdHash: 1190796178
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -153,6 +153,8 @@ MonoBehaviour:
   moveSpeed: 10
   slowDownRadius: 5
   stopDistance: 0.03
+  limitMoveAreaMin: {x: -20, y: -20}
+  limitMoveAreaMax: {x: 20, y: 20}
 --- !u!1 &4034474986670432828
 GameObject:
   m_ObjectHideFlags: 0

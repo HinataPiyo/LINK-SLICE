@@ -5204,6 +5204,7 @@ MonoBehaviour:
   cliantButton: {fileID: 1323218717}
   battleStartButton: {fileID: 550340463}
   battleSceneName: Battle
+  minPlayersToStart: 2
 --- !u!114 &270789842
 MonoBehaviour:
   m_ObjectHideFlags: 0
