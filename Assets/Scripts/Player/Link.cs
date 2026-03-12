@@ -1,5 +1,6 @@
 namespace Player.Link
 {
+    using NUnit.Framework.Constraints;
     using UnityEngine;
 
     /// <summary>
@@ -7,6 +8,7 @@ namespace Player.Link
     /// </summary>
     public class Link : MonoBehaviour
     {
+        [SerializeField] LayerMask targetLayer;
         [SerializeField] float maxLineWidth = 0.15f;
         [SerializeField] float growDuration = 0.2f;
         [SerializeField] float shrinkDuration = 0.12f;
@@ -75,6 +77,7 @@ namespace Player.Link
                 float angle = Mathf.Atan2(targetPos.y - selfPos.y, targetPos.x - selfPos.x) * Mathf.Rad2Deg;
                 float length = Vector2.Distance(selfPos, targetPos);
                 linkEffect.UpdateVisual(center, angle, length);
+                GetHitCollider(angle, length);
             }
 
             // 接続先が存在し、かつ切断中でない間だけリンクを有効にする
@@ -113,6 +116,24 @@ namespace Player.Link
             if (!isLinkActive) return;
 
             linkEffect.EnsurePlaying();
+        }
+
+        /// <summary>
+        /// 敵を攻撃するための当たり判定を取得する
+        /// </summary>
+        /// <param name="angle"> 攻撃の角度（度数法）</param>
+        /// <param name="distance"> 攻撃の距離 </param>
+        public void GetHitCollider(float angle, float distance)
+        {
+            Vector2 origin = transform.position;
+            Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+            RaycastHit2D hit = Physics2D.Raycast(origin, dir, distance, targetLayer);
+            Debug.DrawRay(origin, dir * distance, Color.red, 0.1f);
+
+            if (hit.collider != null)
+            {
+                Debug.Log($"Hit: {hit.collider.name}");
+            }
         }
     }
 }
