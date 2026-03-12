@@ -1,92 +1,92 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Unity.Netcode;
 
-public class NetWorkManagerUI : MonoBehaviour
+public class NetworkManagerUI : MonoBehaviour
 {
     [SerializeField] Button hostButton;
     [SerializeField] Button cliantButton;
     [SerializeField] Button battleStartButton;
     [SerializeField] string battleSceneName = "Battle";
+    [SerializeField] int minPlayersToStart = 2;
+
+    NetworkSessionService sessionService;
 
     void Awake()
     {
-        if (battleStartButton != null)
-        {
-            battleStartButton.interactable = false;
-        }
+        if (battleStartButton != null) battleStartButton.interactable = false;
 
         hostButton.onClick.AddListener(() =>
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
+            if (sessionService == null)
             {
-                Debug.LogWarning("NetworkManager が見つかりません");
+                Debug.LogWarning("NetworkSessionService が未初期化です");
                 return;
             }
 
-            if (networkManager.IsListening)
-            {
-                Debug.LogWarning("すでにセッションが開始されています");
-                return;
-            }
-
-            bool started = networkManager.StartHost();
-            if (!started)
-            {
-                Debug.LogWarning("Host の起動に失敗しました");
-                return;
-            }
-
-            if (battleStartButton != null)
-            {
-                battleStartButton.interactable = true;
-            }
+            sessionService.TryStartHost();
         });
 
         cliantButton.onClick.AddListener(() =>
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
+            if (sessionService == null)
             {
-                Debug.LogWarning("NetworkManager が見つかりません");
+                Debug.LogWarning("NetworkSessionService が未初期化です");
                 return;
             }
 
-            if (networkManager.IsListening)
-            {
-                Debug.LogWarning("すでにセッションが開始されています");
-                return;
-            }
-
-            bool started = networkManager.StartClient();
-            if (!started)
-            {
-                Debug.LogWarning("Client の接続開始に失敗しました");
-            }
+            sessionService.TryStartClient();
         });
 
         battleStartButton.onClick.AddListener(() =>
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
+            if (sessionService == null)
             {
-                Debug.LogWarning("NetworkManager が見つかりません");
+                Debug.LogWarning("NetworkSessionService が未初期化です");
                 return;
             }
 
-            // サーバー側でゲーム開始の処理を呼び出す
-            if (!networkManager.IsServer) return;
-
-            if (!networkManager.IsListening)
-            {
-                Debug.LogWarning("ネットワークが開始されていません");
-                return;
-            }
-
-            Debug.Log("ゲーム開始!（ネットワーク同期でBattleへ遷移）");
-            networkManager.SceneManager.LoadScene(battleSceneName, LoadSceneMode.Single);
+            sessionService.TryStartBattle();
         });
+    }
+
+    void Start()
+    {
+        sessionService = new NetworkSessionService(minPlayersToStart, battleSceneName);
+        sessionService.SessionStateChanged += RefreshUiState;
+        RefreshUiState();
+    }
+
+    void OnDestroy()
+    {
+        if (sessionService != null)
+        {
+            sessionService.SessionStateChanged -= RefreshUiState;
+            sessionService.Dispose();
+            sessionService = null;
+        }
+    }
+
+    /// <summary>
+    /// UI の状態をセッションの状態に応じて更新します。
+    /// </summary>
+    void RefreshUiState()
+    {
+        if (sessionService == null)
+        {
+            if (battleStartButton != null) battleStartButton.interactable = false;
+            if (hostButton != null) hostButton.interactable = true;
+            if (cliantButton != null) cliantButton.interactable = true;
+            return;
+        }
+
+        bool canChooseRole = !sessionService.IsListening;
+        if (hostButton != null) hostButton.interactable = canChooseRole;
+        if (cliantButton != null) cliantButton.interactable = canChooseRole;
+        if (battleStartButton != null) battleStartButton.interactable = sessionService.CanStartBattle;
+
+        if (sessionService.IsListening)
+        {
+            Debug.Log($"接続プレイヤー数: {sessionService.ConnectedPlayerCount}");
+        }
     }
 }

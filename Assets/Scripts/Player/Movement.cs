@@ -12,6 +12,9 @@ namespace Player
         [SerializeField] float moveSpeed = 10f;
         [SerializeField] float slowDownRadius = 5f;
         [SerializeField] float stopDistance = 0.03f;
+
+        [SerializeField] Vector2 limitMoveAreaMin = new Vector2(-10f, -6f);
+        [SerializeField] Vector2 limitMoveAreaMax = new Vector2(10f, 6f);
         Vector2 pointerScreenPos;
         bool hasPointerPos;
 
@@ -46,6 +49,8 @@ namespace Player
             float depth = transform.position.z - mainCamera.transform.position.z;
             Vector3 cursorWorldPos = mainCamera.ScreenToWorldPoint(new Vector3(pointerScreenPos.x, pointerScreenPos.y, depth));
             cursorWorldPos.z = transform.position.z;
+            cursorWorldPos.x = Mathf.Clamp(cursorWorldPos.x, FollowCamera.LimitMoveAreaMin.x, FollowCamera.LimitMoveAreaMax.x);
+            cursorWorldPos.y = Mathf.Clamp(cursorWorldPos.y, FollowCamera.LimitMoveAreaMin.y, FollowCamera.LimitMoveAreaMax.y);
 
             // 目標に近いほど速度を落とす（停止距離以内なら完全停止）
             float distance = Vector2.Distance(transform.position, cursorWorldPos);
@@ -58,8 +63,42 @@ namespace Player
             float normalizedDistance = Mathf.Clamp01(distance / Mathf.Max(0.0001f, slowDownRadius));
             float currentSpeed = moveSpeed * normalizedDistance;
 
-            // プレイヤーを目標に向かって移動させる
-            transform.position = Vector2.MoveTowards(transform.position, cursorWorldPos, currentSpeed * Time.deltaTime);
+            // サーバー権威のTransformでも動くように、移動適用はサーバー側で行う
+            if (IsServer)
+            {
+                ApplyMove(cursorWorldPos, currentSpeed, Time.deltaTime);
+                return;
+            }
+
+            RequestMoveServerRpc(cursorWorldPos, currentSpeed);
+        }
+
+        [ServerRpc]
+        void RequestMoveServerRpc(Vector3 cursorWorldPos, float currentSpeed)
+        {
+            ApplyMove(cursorWorldPos, currentSpeed, Time.deltaTime);
+        }
+
+        void ApplyMove(Vector3 targetPosition, float currentSpeed, float deltaTime)
+        {
+            Vector3 nextPosition = Vector2.MoveTowards(transform.position, targetPosition, currentSpeed * deltaTime);
+            nextPosition.x = Mathf.Clamp(nextPosition.x, limitMoveAreaMin.x, limitMoveAreaMax.x);
+            nextPosition.y = Mathf.Clamp(nextPosition.y, limitMoveAreaMin.y, limitMoveAreaMax.y);
+            nextPosition.z = transform.position.z;
+            transform.position = nextPosition;
+        }
+
+        void OnValidate()
+        {
+            if (limitMoveAreaMax.x < limitMoveAreaMin.x)
+            {
+                limitMoveAreaMax.x = limitMoveAreaMin.x;
+            }
+
+            if (limitMoveAreaMax.y < limitMoveAreaMin.y)
+            {
+                limitMoveAreaMax.y = limitMoveAreaMin.y;
+            }
         }
     }
 }

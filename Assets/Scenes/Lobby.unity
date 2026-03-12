@@ -5180,7 +5180,7 @@ GameObject:
   - component: {fileID: 270789844}
   - component: {fileID: 270789843}
   - component: {fileID: 270789842}
-  - component: {fileID: 270789841}
+  - component: {fileID: 270789846}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -5188,22 +5188,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &270789841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 270789840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17c9e8eacf77b3b46907c056bac47c48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hostButton: {fileID: 1697026831}
-  cliantButton: {fileID: 1323218717}
-  battleStartButton: {fileID: 550340463}
-  battleSceneName: Battle
 --- !u!114 &270789842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5287,6 +5271,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &270789846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270789840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c9e8eacf77b3b46907c056bac47c48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hostButton: {fileID: 1697026831}
+  cliantButton: {fileID: 1323218717}
+  battleStartButton: {fileID: 550340463}
+  battleSceneName: Battle
+  minPlayersToStart: 2
 --- !u!1 &306885093
 GameObject:
   m_ObjectHideFlags: 0
@@ -5324,7 +5325,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: -680}
+  m_SizeDelta: {x: 100, y: -600}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &306885095
 MonoBehaviour:

@@ -3,7 +3,6 @@ namespace Player.Link
     using System.Collections.Generic;
     using System.Collections;
     using UnityEngine;
-    using Unity.Netcode;
     
     [DisallowMultipleComponent]
     public class LinkController : MonoBehaviour
@@ -49,30 +48,12 @@ namespace Player.Link
         }
 
         /// <summary>
-        /// プレイヤーを収集する。
-        /// ネットワーク開始前はシーン内のMovementコンポーネントをプレイヤーとして収集し、ネットワーク開始後はNetworkManagerに接続されているクライアントのPlayerObjectをプレイヤーとして収集する。
+        /// シーン内のMovementコンポーネントをプレイヤーとして収集する。
         /// </summary>
         /// <param name="result"></param>
         void CollectPlayers(List<Transform> result)
         {
             result.Clear();
-
-            NetworkManager networkManager = NetworkManager.Singleton;
-            if (networkManager != null && networkManager.IsListening)
-            {
-                foreach (NetworkClient client in networkManager.ConnectedClientsList)
-                {
-                    NetworkObject playerObject = client.PlayerObject;
-                    // プレイヤーオブジェクトが存在しない、または非アクティブの場合はスキップする
-                    if (playerObject == null || !playerObject.gameObject.activeInHierarchy) continue;
-
-                    result.Add(playerObject.transform);
-                }
-
-                return;
-            }
-
-            // ネットワーク開始前のテスト用フォールバック
             Movement[] fallbackPlayers = FindObjectsByType<Movement>(FindObjectsSortMode.None);
             for (int i = 0; i < fallbackPlayers.Length; i++)
             {
