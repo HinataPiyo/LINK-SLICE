@@ -10,7 +10,7 @@ namespace Enemy
 
         void Update()
         {
-            if (!IsServer) return;
+            // if (!IsServer) return;
 
             // とりあえず原点に向かって動かすだけ。必要に応じてプレイヤーを追いかけるなどの処理を追加する
             transform.position = Vector2.MoveTowards(transform.position, Vector2.zero, moveSpeed * Time.deltaTime);
