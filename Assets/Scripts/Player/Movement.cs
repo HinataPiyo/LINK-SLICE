@@ -2,11 +2,12 @@ namespace Player
 {
     using UnityEngine;
     using UnityEngine.InputSystem;
+    using Unity.Netcode;
 
     /// <summary>
     /// プレイヤーを移動させるクラス
     /// </summary>
-    public class Movement : MonoBehaviour
+    public class Movement : NetworkBehaviour
     {
         [SerializeField] float moveSpeed = 10f;
         [SerializeField] float slowDownRadius = 5f;
@@ -27,6 +28,11 @@ namespace Player
 
         void Update()
         {
+            if (!IsOwner) return;
+
+            Camera mainCamera = Camera.main;
+            if (mainCamera == null) return;
+
             // マウスが使える環境では毎フレーム現在位置を取得する
             if (Mouse.current != null)
             {
@@ -34,14 +40,11 @@ namespace Player
                 hasPointerPos = true;
             }
 
-            if (!hasPointerPos)
-            {
-                return;
-            }
+            if (!hasPointerPos) return;
 
             // 画面座標のカーソル位置をプレイヤーと同じZ平面のワールド座標へ変換する
-            float depth = transform.position.z - Camera.main.transform.position.z;
-            Vector3 cursorWorldPos = Camera.main.ScreenToWorldPoint(new Vector3(pointerScreenPos.x, pointerScreenPos.y, depth));
+            float depth = transform.position.z - mainCamera.transform.position.z;
+            Vector3 cursorWorldPos = mainCamera.ScreenToWorldPoint(new Vector3(pointerScreenPos.x, pointerScreenPos.y, depth));
             cursorWorldPos.z = transform.position.z;
 
             // 目標に近いほど速度を落とす（停止距離以内なら完全停止）
@@ -58,6 +61,5 @@ namespace Player
             // プレイヤーを目標に向かって移動させる
             transform.position = Vector2.MoveTowards(transform.position, cursorWorldPos, currentSpeed * Time.deltaTime);
         }
-
     }
 }
