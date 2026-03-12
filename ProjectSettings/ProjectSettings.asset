@@ -141,7 +141,9 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 1.0
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: 9a95a26d9abcd5a4a9a2a44b1514fab4, type: 2}
+  - {fileID: -944628639613478452, guid: 442fcf07e53e7684fae28d3191082bc3, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -769,7 +771,7 @@ PlayerSettings:
   cloudProjectId: bc123ffc-dde7-4ff4-8883-6d35d427d38c
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: LINK&SLICE
+  projectName: LINK-SLICE
   organizationId: tairo8291
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
