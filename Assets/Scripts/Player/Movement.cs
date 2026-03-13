@@ -1,4 +1,4 @@
-namespace Player
+namespace PlayerSystem
 {
     using UnityEngine;
     using UnityEngine.InputSystem;
@@ -12,9 +12,6 @@ namespace Player
         [SerializeField] float moveSpeed = 10f;
         [SerializeField] float slowDownRadius = 5f;
         [SerializeField] float stopDistance = 0.03f;
-
-        [SerializeField] Vector2 limitMoveAreaMin = new Vector2(-10f, -6f);
-        [SerializeField] Vector2 limitMoveAreaMax = new Vector2(10f, 6f);
         Vector2 pointerScreenPos;
         bool hasPointerPos;
 
@@ -31,6 +28,7 @@ namespace Player
 
         void Update()
         {
+            // 自分の操作するプレイヤー以外は処理しない
             if (!IsOwner) return;
 
             Camera mainCamera = Camera.main;
@@ -82,23 +80,11 @@ namespace Player
         void ApplyMove(Vector3 targetPosition, float currentSpeed, float deltaTime)
         {
             Vector3 nextPosition = Vector2.MoveTowards(transform.position, targetPosition, currentSpeed * deltaTime);
-            nextPosition.x = Mathf.Clamp(nextPosition.x, limitMoveAreaMin.x, limitMoveAreaMax.x);
-            nextPosition.y = Mathf.Clamp(nextPosition.y, limitMoveAreaMin.y, limitMoveAreaMax.y);
+            // 目標座標と同じ境界値で最終位置も制限し、二重Clampの不一致を防ぐ。
+            nextPosition.x = Mathf.Clamp(nextPosition.x, FollowCamera.LimitMoveAreaMin.x, FollowCamera.LimitMoveAreaMax.x);
+            nextPosition.y = Mathf.Clamp(nextPosition.y, FollowCamera.LimitMoveAreaMin.y, FollowCamera.LimitMoveAreaMax.y);
             nextPosition.z = transform.position.z;
             transform.position = nextPosition;
-        }
-
-        void OnValidate()
-        {
-            if (limitMoveAreaMax.x < limitMoveAreaMin.x)
-            {
-                limitMoveAreaMax.x = limitMoveAreaMin.x;
-            }
-
-            if (limitMoveAreaMax.y < limitMoveAreaMin.y)
-            {
-                limitMoveAreaMax.y = limitMoveAreaMin.y;
-            }
         }
     }
 }

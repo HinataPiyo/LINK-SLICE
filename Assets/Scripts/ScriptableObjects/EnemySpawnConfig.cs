@@ -1,7 +1,7 @@
 namespace Enemy
 {
     using System.Collections.Generic;
-    using Player;
+    using PlayerSystem;
     using UnityEngine;
     public enum SpawnPositionPattern { Random, Grouped }
 

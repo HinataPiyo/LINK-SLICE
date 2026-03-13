@@ -1,4 +1,4 @@
-namespace Player.Link
+namespace PlayerSystem.Link
 {
     using Common;
     using UnityEngine;

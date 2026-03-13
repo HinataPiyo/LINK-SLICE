@@ -1,4 +1,4 @@
-namespace Player
+namespace PlayerSystem
 {
     using Unity.Cinemachine;
     using UnityEngine;
