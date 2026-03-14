@@ -7,7 +7,14 @@ namespace Enemy
 
     public class EnemySpawnController : MonoBehaviour
     {
+        public static EnemySpawnController I { get; private set; }     // シングルトンインスタンス
         [SerializeField] EnemySpawnConfig[] spawnConfigs;
+        public List<GameObject> ActiveEnemies { get; private set; } = new List<GameObject>();     // 現在アクティブな敵のリスト
+
+        void Awake()
+        {
+            if(I == null) I = this;
+        }
 
         void Start()
         {
@@ -28,12 +35,13 @@ namespace Enemy
             {
                 foreach (EnemyWaveEntry entry in config.Entries)
                 {
-                    List<GameObject> spawnedEnemies = new List<GameObject>(); // 生成された敵のリスト
                     for (int i = 0; i < entry.spawnCount; i++)
                     {
-                        Spawn(entry, spawnedEnemies);       // 敵の生成
+                        Spawn(entry, ActiveEnemies);       // 敵の生成
                         yield return new WaitForSeconds(entry.spawnInterval);
                     }
+
+                    yield return new WaitUntil(() => ActiveEnemies.Count == 0);    // 生成された敵が全て倒されるまで待機
                 }
             }
         }
@@ -41,10 +49,10 @@ namespace Enemy
         /// <summary>
         /// 敵の生成処理
         /// </summary>
-        void Spawn(EnemyWaveEntry entry, List<GameObject> spawnedEnemies)
+        void Spawn(EnemyWaveEntry entry, List<GameObject> ActiveEnemies)
         {
             Vector3 spawnPos;
-            if(spawnedEnemies.Count == 0)
+            if(ActiveEnemies.Count == 0)
             {
                 // 最初の敵はランダムな位置に生成
                 spawnPos = EnemySpawnConfig.GetSpawnPosition(SpawnPositionPattern.Random);
@@ -53,7 +61,7 @@ namespace Enemy
             {
                 if(entry.spawnPattern == SpawnPositionPattern.Grouped)
                 {
-                    spawnPos = EnemySpawnConfig.GetSpawnPosition(entry.spawnPattern, spawnedEnemies[0].transform.position); // グループ化された位置の取得
+                    spawnPos = EnemySpawnConfig.GetSpawnPosition(entry.spawnPattern, ActiveEnemies[0].transform.position); // グループ化された位置の取得
                 }
                 else
                 {
@@ -69,7 +77,17 @@ namespace Enemy
                 networkObject.Spawn(true);
             }
 
-            spawnedEnemies.Add(enemy);
+            ActiveEnemies.Add(enemy);
+        }
+
+        /// <summary>
+        /// 敵が倒されたときに呼び出されるメソッド
+        /// </summary>
+        /// <param name="enemy">倒された敵のゲームオブジェクト</param>
+        public void RemoveEnemy(GameObject enemy)
+        {
+            ActiveEnemies.Remove(enemy);     // 敵をリストから削除
+            Debug.Log("Enemy removed. Remaining enemies: " + ActiveEnemies.Count);
         }
     }
 }

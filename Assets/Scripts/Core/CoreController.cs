@@ -2,7 +2,7 @@ namespace Core
 {
     using UnityEngine;
 
-    public class CoreController : MonoBehaviour, IDamageable
+    public class CoreController : MonoBehaviour
     {
         [Header("コアが確保しているエネルギーの設定")]
         [SerializeField] float maxGenerateEnergy = 100f;    // 初期エネルギー
@@ -34,28 +34,13 @@ namespace Core
         }
 
         /// <summary>
-        /// コアがダメージを受けたときの処理
-        /// </summary>
-        /// <param name="damage"></param>
-        public void TakeDamage(float damage)
-        {
-            CurrentEnergy = Mathf.Max(0f, CurrentEnergy - damage);      // エネルギーを減らす（0未満にならないように）
-            CoreVisualUpdate();
-
-            if(CurrentEnergy <= 0f)
-            {
-                // エネルギーが0になったときの処理（ゲームオーバー）
-                Debug.Log("Core has been destroyed!");
-            }
-        }
-
-        /// <summary>
         /// コアのビジュアルを更新する処理
         /// </summary>
-        void CoreVisualUpdate()
+        public void CoreVisualUpdate()
         {
+            if(energyCircleTransform == null) return;
             // エネルギーの円のスケールをエネルギーの割合に応じて変える
-            float energyRatio = CurrentEnergy / maxGenerateEnergy;
+            float energyRatio = Mathf.Clamp01(CurrentEnergy / maxGenerateEnergy);
             energyCircleTransform.localScale = new Vector3(energyRatio, energyRatio, 1f);
         }
     }

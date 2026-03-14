@@ -58,7 +58,7 @@ namespace Enemy
     {
         public GameObject enemyPrefab;
         public SpawnPositionPattern spawnPattern;    // 生成位置のパターン
-        [Range(1, 10)] public int spawnCount;                              // 生成数
+        [Range(1, 100)] public int spawnCount;                              // 生成数
         [Tooltip("個々の敵の生成間隔"), Range(0.1f, 3f)] public float spawnInterval;      // 生成間隔
     }
 }

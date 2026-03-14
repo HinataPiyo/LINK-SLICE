@@ -4911,7 +4911,7 @@ GameObject:
   - component: {fileID: 1840364896727108822}
   - component: {fileID: 907102635298086477}
   m_Layer: 0
-  m_Name: DieEffect
+  m_Name: Enemy_Triangle_DieEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

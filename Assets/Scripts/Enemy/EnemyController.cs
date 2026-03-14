@@ -4,6 +4,7 @@ namespace Enemy
     using Unity.Netcode;
     
     [RequireComponent(typeof(Attack))]
+    [RequireComponent(typeof(Health))]
     [RequireComponent(typeof(Movement))]
     [RequireComponent(typeof(GetTarget))]
     public class EnemyController : NetworkBehaviour

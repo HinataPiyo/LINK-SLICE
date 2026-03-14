@@ -132,18 +132,18 @@ namespace PlayerSystem.Link
 
             if (hit.collider != null)
             {
-                Health targetHealth = hit.collider.GetComponent<Health>();
-                if (targetHealth == null) return;
-                OnAttack(targetHealth);
+                IDamageable damageableTarget = hit.collider.GetComponent<IDamageable>();
+                if (damageableTarget == null) return;
+                OnAttack(damageableTarget);
             }
         }
 
         /// <summary>
         /// 攻撃処理。Healthコンポーネントを持つオブジェクトに対してダメージを与える
         /// </summary>
-        void OnAttack(Health targetHealth)
+        void OnAttack(IDamageable damageableTarget)
         {
-            targetHealth.TakeDamage(1);
+            damageableTarget.TakeDamage(1);
         }
     }
 }
