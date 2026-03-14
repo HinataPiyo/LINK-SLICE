@@ -16,7 +16,7 @@ MonoBehaviour:
   - enemyPrefab: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
     spawnPattern: 1
     spawnCount: 4
-    spawnInterval: 0.2
+    spawnInterval: 0.1
   - enemyPrefab: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
     spawnPattern: 0
     spawnCount: 10
@@ -24,4 +24,4 @@ MonoBehaviour:
   - enemyPrefab: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
     spawnPattern: 1
     spawnCount: 100
-    spawnInterval: 0.45
+    spawnInterval: 0.1

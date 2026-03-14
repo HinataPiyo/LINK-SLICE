@@ -3,6 +3,7 @@ namespace Enemy
     using System.Collections.Generic;
     using PlayerSystem;
     using UnityEngine;
+    
     public enum SpawnPositionPattern { Random, Grouped }
 
     [CreateAssetMenu(fileName = "EnemySpawnConfig", menuName = "Config/EnemySpawnConfig")]

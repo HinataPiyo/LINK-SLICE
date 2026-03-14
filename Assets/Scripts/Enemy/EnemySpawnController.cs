@@ -13,7 +13,7 @@ namespace Enemy
 
         void Awake()
         {
-            if(I == null) I = this;
+            if (I == null) I = this;
         }
 
         void Start()
@@ -35,10 +35,21 @@ namespace Enemy
             {
                 foreach (EnemyWaveEntry entry in config.Entries)
                 {
+                    SpawnPositionPattern pattern = entry.spawnPattern;
+
                     for (int i = 0; i < entry.spawnCount; i++)
                     {
-                        Spawn(entry, ActiveEnemies);       // 敵の生成
-                        yield return new WaitForSeconds(entry.spawnInterval);
+                        // 敵の生成パターンがグループだった場合
+                        if (pattern == SpawnPositionPattern.Grouped)
+                        {
+                            Spawn(entry.enemyPrefab, pattern);
+                            yield return null;
+                        }
+                        else if (pattern == SpawnPositionPattern.Random)     // 敵の生成パターンがランダムだった場合
+                        {
+                            Spawn(entry.enemyPrefab, pattern);
+                            yield return new WaitForSeconds(entry.spawnInterval);     // 個々の敵の生成間隔を待機
+                        }
                     }
 
                     yield return new WaitUntil(() => ActiveEnemies.Count == 0);    // 生成された敵が全て倒されるまで待機
@@ -49,35 +60,36 @@ namespace Enemy
         /// <summary>
         /// 敵の生成処理
         /// </summary>
-        void Spawn(EnemyWaveEntry entry, List<GameObject> ActiveEnemies)
+        void Spawn(GameObject enemy, SpawnPositionPattern pattern)
         {
             Vector3 spawnPos;
-            if(ActiveEnemies.Count == 0)
+            if (ActiveEnemies.Count == 0)        // 最初の敵を生成するときはランダムな位置に生成
             {
-                // 最初の敵はランダムな位置に生成
+                //! 最初の敵はランダムな位置に生成(ランダム固定)
                 spawnPos = EnemySpawnConfig.GetSpawnPosition(SpawnPositionPattern.Random);
             }
-            else
+            else        // 2体目以降
             {
-                if(entry.spawnPattern == SpawnPositionPattern.Grouped)
+                // グループ化された位置を取得
+                if (pattern == SpawnPositionPattern.Grouped)
                 {
-                    spawnPos = EnemySpawnConfig.GetSpawnPosition(entry.spawnPattern, ActiveEnemies[0].transform.position); // グループ化された位置の取得
+                    spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern, ActiveEnemies[0].transform.position); // グループ化された位置の取得
                 }
-                else
+                else        // ランダムな位置を取得
                 {
-                    spawnPos = EnemySpawnConfig.GetSpawnPosition(entry.spawnPattern);       // 生成位置の取得
+                    spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern);       // 生成位置の取得
                 }
             }
-            
-            GameObject enemy = Instantiate(entry.enemyPrefab, spawnPos, Quaternion.identity);
 
-            NetworkObject networkObject = enemy.GetComponent<NetworkObject>();
-            if (networkObject != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            GameObject spawnedEnemy = Instantiate(enemy, spawnPos, Quaternion.identity);
+
+            NetworkObject networkObject = spawnedEnemy.GetComponent<NetworkObject>();
+            if (networkObject != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && !networkObject.IsSpawned)
             {
                 networkObject.Spawn(true);
             }
 
-            ActiveEnemies.Add(enemy);
+            ActiveEnemies.Add(spawnedEnemy);
         }
 
         /// <summary>

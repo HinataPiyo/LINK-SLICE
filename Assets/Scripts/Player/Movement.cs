@@ -16,7 +16,10 @@ namespace PlayerSystem
                 return;
             }
 
-            transform.position = Vector3.MoveTowards(transform.position, mouseWorldPosition, moveSpeed * Time.deltaTime);
+            Vector3 nextPosition = Vector3.MoveTowards(transform.position, mouseWorldPosition, moveSpeed * Time.deltaTime);
+            transform.position = new Vector3(Mathf.Clamp(nextPosition.x, FollowCamera.LimitMoveAreaMin.x, FollowCamera.LimitMoveAreaMax.x),
+                                             Mathf.Clamp(nextPosition.y, FollowCamera.LimitMoveAreaMin.y, FollowCamera.LimitMoveAreaMax.y),
+                                             nextPosition.z);
         }
 
         /// <summary>
