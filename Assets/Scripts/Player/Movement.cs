@@ -9,7 +9,7 @@ namespace PlayerSystem
 
         void Update()
         {
-            if (!IsOwner) return;        // 自分のプレイヤーオブジェクトでなければ、以降の処理をスキップ
+            // if (!IsOwner) return;        // 自分のプレイヤーオブジェクトでなければ、以降の処理をスキップ
 
             if (!TryGetMouseWorldPosition(out Vector3 mouseWorldPosition))
             {
@@ -19,6 +19,10 @@ namespace PlayerSystem
             transform.position = Vector3.MoveTowards(transform.position, mouseWorldPosition, moveSpeed * Time.deltaTime);
         }
 
+        /// <summary>
+        /// マウスのスクリーン座標をワールド座標に変換する。失敗した場合はfalseを返す。
+        /// </summary>
+        /// <param name="mouseWorldPosition">変換されたワールド座標</param>
         bool TryGetMouseWorldPosition(out Vector3 mouseWorldPosition)
         {
             Camera mainCamera = Camera.main;

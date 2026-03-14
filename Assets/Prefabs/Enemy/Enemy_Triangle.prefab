@@ -100,7 +100,10 @@ GameObject:
   - component: {fileID: 3218074460964751067}
   - component: {fileID: 5286901393127078967}
   - component: {fileID: 2320890260954978022}
+  - component: {fileID: 3001682140745015783}
   - component: {fileID: 8198151508004392855}
+  - component: {fileID: 4872893286984620975}
+  - component: {fileID: 8401947634918144102}
   m_Layer: 6
   m_Name: Enemy_Triangle
   m_TagString: Untagged
@@ -245,6 +248,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1
   dieEffectPrefab: {fileID: 907102635298086477, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
+--- !u!114 &3001682140745015783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8230666044413299622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1157aa682d149cc4aa383afb1e86babf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &8198151508004392855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,5 +273,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3021b1302bfbcda45967b595b9ee35e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 3
+--- !u!114 &4872893286984620975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8230666044413299622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50c068c3a8398ee4e9675c5aa3a7a7be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strength: 10
+  attackRate: 1
+--- !u!114 &8401947634918144102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8230666044413299622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e2ec3df4be70374b9cbd5418c2d85e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rayDistance: 1
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
