@@ -1,9 +1,10 @@
 namespace Core
 {
-    using Common;
+    using Unity.Netcode;
     using UnityEngine;
 
-    public class CoreController : MonoBehaviour
+
+    public class CoreController : NetworkBehaviour
     {
         [Header("コアが確保しているエネルギーの設定")]
         [SerializeField] Transform energyCircleTransform;   // エネルギーの円のTransform
@@ -21,6 +22,7 @@ namespace Core
 
         void Update()
         {
+            //! if(!IsServer) return;        // サーバーでなければ、以降の処理をスキップ
             SquareRotationUpdate();
         }
 

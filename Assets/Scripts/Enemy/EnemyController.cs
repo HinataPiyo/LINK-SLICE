@@ -22,7 +22,8 @@ namespace Enemy
 
         void Update()
         {
-            // if(!IsServer) return;            // サーバーでなければ、以降の処理をスキップ
+            //! if(!IsServer) return;            // サーバーでなければ、以降の処理をスキップ
+            
             if(attack.IsAtatcking) return;      // 攻撃中であれば、以降の処理をスキップ
             GameObject target = getTarget.GetTargetObject();    
 
