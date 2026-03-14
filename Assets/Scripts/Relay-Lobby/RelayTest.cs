@@ -160,6 +160,14 @@ public class RelayTest : MonoBehaviour
                 return false;
             }
 
+            bool connected = await WaitForClientConnectionAsync();
+            if (!connected)
+            {
+                Debug.LogWarning("Client 接続完了前にタイムアウトしました。NetworkManager を停止します");
+                networkManager.Shutdown();
+                return false;
+            }
+
             Debug.Log("StartClient 成功");
             return true;
         }
@@ -213,5 +221,30 @@ public class RelayTest : MonoBehaviour
             Debug.Log(e);
             return null;
         }
+    }
+
+    private async Task<bool> WaitForClientConnectionAsync()
+    {
+        if (networkManager == null)
+        {
+            return false;
+        }
+
+        const int timeoutMs = 15000;
+        const int waitStepMs = 100;
+        int elapsedMs = 0;
+
+        while (elapsedMs < timeoutMs)
+        {
+            if (networkManager.IsConnectedClient)
+            {
+                return true;
+            }
+
+            await Task.Delay(waitStepMs);
+            elapsedMs += waitStepMs;
+        }
+
+        return false;
     }
 }

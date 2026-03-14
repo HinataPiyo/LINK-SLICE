@@ -19,7 +19,7 @@ public class NetcodeSceneTransitionCoordinator
 
         expectedPlayers = Mathf.Max(1, expectedPlayers);
         const int waitStepMs = 200;
-        const int timeoutMs = 10000;
+        const int timeoutMs = 15000;
         int elapsedMs = 0;
 
         while (elapsedMs < timeoutMs)

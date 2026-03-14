@@ -2,6 +2,7 @@ namespace Enemy
 {
     using System.Collections;
     using System.Collections.Generic;
+    using Unity.Netcode;
     using UnityEngine;
 
     public class EnemySpawnController : MonoBehaviour
@@ -10,6 +11,11 @@ namespace Enemy
 
         void Start()
         {
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && !NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             StartCoroutine(SpawnRoutine());
         }
 
@@ -56,6 +62,13 @@ namespace Enemy
             }
             
             GameObject enemy = Instantiate(entry.enemyPrefab, spawnPos, Quaternion.identity);
+
+            NetworkObject networkObject = enemy.GetComponent<NetworkObject>();
+            if (networkObject != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                networkObject.Spawn(true);
+            }
+
             spawnedEnemies.Add(enemy);
         }
     }
