@@ -1,23 +1,22 @@
 namespace Core
 {
+    using Common;
     using UnityEngine;
 
     public class CoreController : MonoBehaviour
     {
         [Header("コアが確保しているエネルギーの設定")]
-        [SerializeField] float maxGenerateEnergy = 100f;    // 初期エネルギー
         [SerializeField] Transform energyCircleTransform;   // エネルギーの円のTransform
 
         [Header("四角が回転するための設定")]
         [SerializeField] float squareRotationSpeed = 10f;   // 回転速度
         [SerializeField] Transform squareTransform;         // 回転させる四角のTransform
-
-        public float CurrentEnergy { get; private set; }
+        
+        Health health;
 
         void Awake()
         {
-            CurrentEnergy = maxGenerateEnergy;    // 初期エネルギーを設定
-            CoreVisualUpdate();                   // コアのビジュアルを初期化
+            health = GetComponent<Health>();
         }
 
         void Update()
@@ -38,9 +37,10 @@ namespace Core
         /// </summary>
         public void CoreVisualUpdate()
         {
-            if(energyCircleTransform == null) return;
-            // エネルギーの円のスケールをエネルギーの割合に応じて変える
-            float energyRatio = Mathf.Clamp01(CurrentEnergy / maxGenerateEnergy);
+            if (energyCircleTransform == null) return;
+
+            float energyRatio = (float)health.CurrentHealth / health.MaxHealth;     // エネルギーの割合を計算
+            Debug.Log($"CurrentHealth: {health.CurrentHealth}, MaxHealth: {health.MaxHealth}, EnergyRatio: {energyRatio}");
             energyCircleTransform.localScale = new Vector3(energyRatio, energyRatio, 1f);
         }
     }

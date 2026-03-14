@@ -9,18 +9,17 @@ namespace Common
         [SerializeField] Die dieEffectPrefab;
         protected int currentHealth;
 
+        public int MaxHealth => maxHealth;
         public int CurrentHealth => currentHealth;
         public bool IsDead { get; private set; } = false;
 
         void Awake()
         {
+            currentHealth = maxHealth;
             Initialize();
         }
 
-        protected virtual void Initialize()
-        {
-            currentHealth = maxHealth;
-        }
+        protected abstract void Initialize();
 
         public abstract void TakeDamage(int damage);
 

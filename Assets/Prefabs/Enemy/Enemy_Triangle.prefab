@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50c068c3a8398ee4e9675c5aa3a7a7be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strength: 10
+  strength: 1
   attackRate: 1
 --- !u!114 &8401947634918144102
 MonoBehaviour:

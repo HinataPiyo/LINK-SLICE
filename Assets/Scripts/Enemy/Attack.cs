@@ -4,7 +4,7 @@ namespace Enemy
     
     public class Attack : MonoBehaviour
     {
-        [SerializeField] int strength = 10;     // 攻撃の強さ
+        [SerializeField] int strength = 1;     // 攻撃の強さ
         [SerializeField] float attackRate = 1f;     // 攻撃の頻度（1秒あたりの攻撃回数）
         float elapsedTime = 0f;                      // 経過時間
         IDamageable damageableTarget;                      // ダメージを与える対象

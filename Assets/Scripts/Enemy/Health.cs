@@ -5,6 +5,12 @@ namespace Enemy
     
     public class Health : HealthBase
     {
+
+        protected override void Initialize()
+        {
+            
+        }
+
         public override void TakeDamage(int damage)
         {
             if(IsDead) return;     // すでに死亡している場合はダメージを受けない

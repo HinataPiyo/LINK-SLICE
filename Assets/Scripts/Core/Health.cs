@@ -9,8 +9,8 @@ namespace Core
 
         protected override void Initialize()
         {
-            base.Initialize();
             coreCtrl = GetComponent<CoreController>();
+            coreCtrl.CoreVisualUpdate();
         }
 
         /// <summary>
@@ -24,6 +24,7 @@ namespace Core
             currentHealth = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
 
             coreCtrl.CoreVisualUpdate();     // ダメージを受けたときの処理を呼び出す
+            Debug.Log($"CurrentHealth: {CurrentHealth}, MaxHealth: {MaxHealth}");     // デバッグ用に現在の体力と最大体力をログに出す
 
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合
             {
