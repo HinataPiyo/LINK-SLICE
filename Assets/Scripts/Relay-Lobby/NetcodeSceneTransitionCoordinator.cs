@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Common;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -65,13 +66,17 @@ public class NetcodeSceneTransitionCoordinator
             return;
         }
 
-        SceneEventProgressStatus status = networkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        // Load シーン側で最終的なゲームシーン読み込みを行うため、
+        // ここでは直接 Battle へ行かず、まず中継用の Load シーンへ遷移する。
+        GlobalCommon.NextSceneName = sceneName;
+
+        SceneEventProgressStatus status = networkManager.SceneManager.LoadScene(GlobalCommon.LoadingSceneName, LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
         {
-            Debug.LogWarning("シーン遷移開始に失敗しました: " + status + " scene=" + sceneName);
+            Debug.LogWarning("ロードシーンへの遷移開始に失敗しました: " + status + " scene=" + GlobalCommon.LoadingSceneName);
             return;
         }
 
-        Debug.Log("シーン遷移開始: " + sceneName);
+        Debug.Log("ロードシーンへ遷移開始: next=" + sceneName + " via=" + GlobalCommon.LoadingSceneName);
     }
 }

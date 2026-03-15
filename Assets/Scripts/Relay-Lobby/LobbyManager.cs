@@ -16,6 +16,13 @@ public class LobbyManager : MonoBehaviour
     public const string KEY_RELAY_CODE = "RelayCode";
     // ゲーム開始ボタンを有効にする最少人数。
     private const int MIN_PLAYERS_TO_START = 2;
+    // ホストが Lobby Service へ生存通知を送る間隔。
+    private const float HEARTBEAT_INTERVAL = 15f;
+    // 非ホスト側がロビー状態を取り直す間隔。
+    private const float POLLING_INTERVAL = 1f;
+    // ロビー作成時の基本設定。
+    private const string DEFAULT_LOBBY_NAME = "TestLobby";
+    private const int DEFAULT_MAX_PLAYERS = 4;
 
     // ロビーUIの更新・ボタン制御を行う窓口。
     [SerializeField] private LobbyEventHandler eventHandler;
@@ -46,46 +53,14 @@ public class LobbyManager : MonoBehaviour
 
     // ホストがロビー生存を維持するための Heartbeat 送信制御。
     private float heartbeatTimer;
-    private float heartbeatInterval = 15f;
     // 非ホスト側がロビー更新を取りにいくポーリング間隔管理。
-    private float pollingTimer = 0f;
+    private float pollingTimer;
     // 終了時のロビー離脱処理が重複しないようにするフラグ。
     private bool isLeavingLobby;
 
     private async void Start()
     {
-        // クライアントごとに別プロフィールを使うため、ランダム名を付与する。
-        playerName = "PlayerName" + UnityEngine.Random.Range(0, 1000).ToString();
-        InitializationOptions initializationOptions = new InitializationOptions();
-        initializationOptions.SetProfile(playerName);
-
-        // Lobby / Relay / Authentication 利用前に Unity Services を初期化する。
-        await UnityServices.InitializeAsync(initializationOptions);
-
-        // 認証状態の変化をログに出す。実際のサインインは匿名で行う。
-        AuthenticationService.Instance.SignedIn += () =>
-        {
-            Debug.Log("Signed in:" + AuthenticationService.Instance.PlayerId);
-        };
-        
-        // 開発時に扱いやすい匿名認証を利用する。
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-        isInitialized = true;
-        lobbyApi = new LobbyApiClient(playerName, KEY_RELAY_CODE);
-        sceneTransitionCoordinator = new NetcodeSceneTransitionCoordinator();
-
-        // 前回異常終了で残った自分ホストのロビーを掃除してから開始する。
-        await DeleteOwnedLobbiesAsync();
-
-        // UI からのイベント購読を初期化完了後に開始する。
-        LobbyEventHandler.OnCreateLobbyRequest += OnCreateLobbyRequested;
-        LobbyEventHandler.OnRefreshLobbyListRequest += OnRefreshLobbyListRequested;
-        LobbyEventHandler.OnGameStartRequest += OnGameStartRequested;
-        LobbyBanner.OnJoinLobby += OnJoinLobbyRequested;
-
-        SyncUiState();
-        await RefreshLobbiesAsync();
+        await InitializeAsync();
     }
 
     /// <summary>
@@ -93,11 +68,7 @@ public class LobbyManager : MonoBehaviour
     /// </summary>
     private void OnDestroy()
     {
-        // static event の購読解除を忘れると、破棄済みオブジェクトに通知が飛ぶ。
-        LobbyEventHandler.OnCreateLobbyRequest -= OnCreateLobbyRequested;
-        LobbyEventHandler.OnRefreshLobbyListRequest -= OnRefreshLobbyListRequested;
-        LobbyEventHandler.OnGameStartRequest -= OnGameStartRequested;
-        LobbyBanner.OnJoinLobby -= OnJoinLobbyRequested;
+        UnsubscribeUiEvents();
 
         if (joinedLobby != null)
         {
@@ -126,6 +97,75 @@ public class LobbyManager : MonoBehaviour
         JoinLobby(lobby);
     }
 
+    /// <summary>
+    /// Lobby / Relay / UI 連携に必要な初期化を順番に行う。
+    /// 
+    /// Start を細かい処理で埋めないよう、初期化の流れはここへまとめている。
+    /// これにより、起動直後の準備手順を上から追いやすくしている。
+    /// </summary>
+    private async Task InitializeAsync()
+    {
+        playerName = CreatePlayerName();
+        await InitializeServicesAsync(playerName);
+
+        lobbyApi = new LobbyApiClient(playerName, KEY_RELAY_CODE);
+        sceneTransitionCoordinator = new NetcodeSceneTransitionCoordinator();
+        isInitialized = true;
+
+        SubscribeUiEvents();
+        await DeleteOwnedLobbiesAsync();
+
+        SyncUiState();
+        await RefreshLobbiesAsync();
+    }
+
+    /// <summary>
+    /// クライアントごとに固有のプロフィール名を作る。
+    /// Lobby の参加者表示と Authentication プロファイルの衝突回避に使う。
+    /// </summary>
+    private string CreatePlayerName()
+    {
+        return "PlayerName" + UnityEngine.Random.Range(0, 1000);
+    }
+
+    /// <summary>
+    /// Unity Services と匿名認証を初期化する。
+    /// Lobby / Relay 利用前提をここでまとめて満たす。
+    /// </summary>
+    private static async Task InitializeServicesAsync(string profileName)
+    {
+        InitializationOptions initializationOptions = new InitializationOptions();
+        initializationOptions.SetProfile(profileName);
+
+        await UnityServices.InitializeAsync(initializationOptions);
+        AuthenticationService.Instance.SignedIn += () => Debug.Log("Signed in:" + AuthenticationService.Instance.PlayerId);
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+    }
+
+    /// <summary>
+    /// UI から飛んでくるイベントを購読する。
+    /// 購読開始を初期化後へ寄せることで、未準備状態のイベント受信を避ける。
+    /// </summary>
+    private void SubscribeUiEvents()
+    {
+        LobbyEventHandler.OnCreateLobbyRequest += OnCreateLobbyRequested;
+        LobbyEventHandler.OnRefreshLobbyListRequest += OnRefreshLobbyListRequested;
+        LobbyEventHandler.OnGameStartRequest += OnGameStartRequested;
+        LobbyBanner.OnJoinLobby += OnJoinLobbyRequested;
+    }
+
+    /// <summary>
+    /// static event の購読を解除する。
+    /// 解除し忘れると、破棄済みオブジェクトへ通知が飛んで例外や重複実行の原因になる。
+    /// </summary>
+    private void UnsubscribeUiEvents()
+    {
+        LobbyEventHandler.OnCreateLobbyRequest -= OnCreateLobbyRequested;
+        LobbyEventHandler.OnRefreshLobbyListRequest -= OnRefreshLobbyListRequested;
+        LobbyEventHandler.OnGameStartRequest -= OnGameStartRequested;
+        LobbyBanner.OnJoinLobby -= OnJoinLobbyRequested;
+    }
+
     private void SyncUiState()
     {
         LobbyControlState controlState = LobbyUiStatePolicy.Build(
@@ -143,12 +183,27 @@ public class LobbyManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 現在の認証済みプレイヤー ID を返す。
+    /// 同じ取り方が複数箇所に出るため、意図を込めて 1 か所にまとめる。
+    /// </summary>
+    private static string CurrentPlayerId => AuthenticationService.Instance.PlayerId;
+
+    /// <summary>
+    /// 開始可能人数を満たしているかを返す。
+    /// StartGame の条件式を短くして、何を見ているかを明確にする。
+    /// </summary>
+    private static bool HasEnoughPlayers(Lobby lobby)
+    {
+        return lobby != null && lobby.Players != null && lobby.Players.Count >= MIN_PLAYERS_TO_START;
+    }
+
+    /// <summary>
     /// Lobby Service 上にロビーを作成し、作成者自身も参加する。成功したらロビー一覧を更新する。
     /// </summary>
     public async void CreateLobby()
     {
         // まだ初期化前 / 作成中 / 既にどこかのロビー参加中なら何もしない。
-        if (!isInitialized || isCreatingLobby || joinedLobby != null)
+        if (!CanCreateLobby())
         {
             SyncUiState();
             return;
@@ -159,11 +214,7 @@ public class LobbyManager : MonoBehaviour
             isCreatingLobby = true;
             SyncUiState();
 
-            string lobbyName = "TestLobby";
-            int maxPlayers = 4;
-            string playerId = AuthenticationService.Instance.PlayerId;
-
-            joinedLobby = await lobbyApi.CreateLobbyAsync(lobbyName, maxPlayers, playerId);
+            joinedLobby = await lobbyApi.CreateLobbyAsync(DEFAULT_LOBBY_NAME, DEFAULT_MAX_PLAYERS, CurrentPlayerId);
             isHost = true;
             await RefreshLobbiesAsync();
         }
@@ -186,25 +237,28 @@ public class LobbyManager : MonoBehaviour
             CreateLobby();
         }
 
-        RefreshLobbyHeatbeat();
+        UpdateLobbyHeartbeat();
         HandleLobbyPolling();
     }
 
     /// <summary>
     /// ホストは定期的に ping を送り、Lobby Service 上でロビー失効を防ぐ。
     /// </summary>
-    private async void RefreshLobbyHeatbeat()
+    private async void UpdateLobbyHeartbeat()
     {
-        if (joinedLobby != null && isHost)
+        if (joinedLobby == null || !isHost)
         {
-            heartbeatTimer += Time.deltaTime;
-            if (heartbeatTimer > heartbeatInterval)
-            {
-                heartbeatTimer = 0.0f;
-                // ホストは定期的に ping を送り、Lobby Service 上でロビー失効を防ぐ。
-                await lobbyApi.SendHeartbeatAsync(joinedLobby.Id);
-            }
+            return;
         }
+
+        heartbeatTimer += Time.deltaTime;
+        if (heartbeatTimer < HEARTBEAT_INTERVAL)
+        {
+            return;
+        }
+
+        heartbeatTimer = 0f;
+        await lobbyApi.SendHeartbeatAsync(joinedLobby.Id);
     }
 
     /// <summary>
@@ -230,34 +284,12 @@ public class LobbyManager : MonoBehaviour
 
             QueryResponse queryResponse = await lobbyApi.QueryLobbiesAsync();
             Debug.Log("Lobbies Count:" + queryResponse.Results.Count);
-            foreach (var lobby in queryResponse.Results)
+            foreach (Lobby lobby in queryResponse.Results)
             {
                 Debug.Log($"Lobby:name {lobby.Name} id {lobby.Id} code {lobby.LobbyCode} maxPlayers {lobby.MaxPlayers}");
             }
 
-            // 取得結果をそのまま一覧表示のベースにする。
-            var displayList = new List<Lobby>(queryResponse.Results);
-
-            if (joinedLobby != null)
-            {
-                int index = displayList.FindIndex(lobby => lobby.Id == joinedLobby.Id);
-                if (index >= 0)
-                {
-                    // クエリ結果で最新情報に更新
-                    joinedLobby = displayList[index];
-                }
-                else
-                {
-                    // Query 結果へまだ反映されていない場合でも、参加中ロビーだけは画面から消さない。
-                    displayList.Insert(0, joinedLobby);
-                }
-            }
-            else
-            {
-                Debug.Log("Not joined to any lobby");
-            }
-            
-            eventHandler.Refresh(displayList);
+            eventHandler.Refresh(BuildDisplayLobbyList(queryResponse.Results));
         }
         catch (LobbyServiceException e)
         {
@@ -277,7 +309,7 @@ public class LobbyManager : MonoBehaviour
     private async void JoinLobby(Lobby lobby)
     {
         // 未初期化 / Join 実行中 / すでに参加中のケースでは多重参加しない。
-        if (!isInitialized || isJoiningLobby || joinedLobby != null)
+        if (!CanJoinLobby(lobby))
         {
             SyncUiState();
             Debug.Log("参加できませんでした");
@@ -289,10 +321,10 @@ public class LobbyManager : MonoBehaviour
             isJoiningLobby = true;
             SyncUiState();
 
-            joinedLobby = await lobbyApi.JoinLobbyByIdAsync(lobby.Id, AuthenticationService.Instance.PlayerId);
+            joinedLobby = await lobbyApi.JoinLobbyByIdAsync(lobby.Id, CurrentPlayerId);
             isHost = false;
             Debug.Log("参加しました。:" + joinedLobby.Id);
-            await RefreshLobbiesAsync();
+            RefreshLobbies();
         }
         catch (LobbyServiceException e)
         {
@@ -308,7 +340,7 @@ public class LobbyManager : MonoBehaviour
     public async void StartGame()
     {
         // 開始要求はホストのみ許可し、状態が整っていない場合は即座に戻す。
-        if (!isInitialized || !isHost || joinedLobby == null || isStartingGame)
+        if (!CanStartGame())
         {
             SyncUiState();
             // 状態が整っていない原因を確かめる
@@ -317,7 +349,7 @@ public class LobbyManager : MonoBehaviour
         }
 
         // 開始前の状態を再確認し、開始要件を満たしていない場合は開始処理を中断する。
-        if (joinedLobby.Players == null || joinedLobby.Players.Count < MIN_PLAYERS_TO_START)
+        if (!HasEnoughPlayers(joinedLobby))
         {
             Debug.Log($"プレイヤーが不足しています: {MIN_PLAYERS_TO_START}人以上必要です");
             SyncUiState();
@@ -362,14 +394,14 @@ public class LobbyManager : MonoBehaviour
     /// </summary>
     private async void HandleLobbyPolling()
     {
-        if (!isInitialized || joinedLobby == null)
+        if (!ShouldPollLobby())
         {
             return;
         }
 
         // 毎フレーム問い合わせないよう、1秒ごとにロビー状態を取り直す。
         pollingTimer += Time.deltaTime;
-        if (pollingTimer < 1f)
+        if (pollingTimer < POLLING_INTERVAL)
         {
             return;
         }
@@ -379,36 +411,15 @@ public class LobbyManager : MonoBehaviour
         {
             // Lobby Service 上の最新状態を取り直し、開始フラグの変化を検出する。
             joinedLobby = await lobbyApi.GetLobbyAsync(joinedLobby.Id);
-            if (!isHost)
+
+            if (isHost)
             {
-                if (isJoiningRelayNetwork)
-                {
-                    return;
-                }
-
-                if (joinedLobby.Data != null
-                    && joinedLobby.Data.ContainsKey(KEY_RELAY_CODE)
-                    && joinedLobby.Data[KEY_RELAY_CODE].Value != "0")
-                {
-                    // ホストが JoinCode を書き込んだら、クライアント側は Relay 参加へ進む。
-                    Debug.Log("StartGame");
-                    string relayCode = joinedLobby.Data[KEY_RELAY_CODE].Value;
-                    isJoiningRelayNetwork = true;
-                    bool joinedRelay = await relayTest.JoinRelayAsync(relayCode);
-                    isJoiningRelayNetwork = false;
-
-                    if (joinedRelay)
-                    {
-                        // 通信開始後はロビー一覧表示へ戻すため、参加中ロビー参照を手放す。
-                        joinedLobby = null;
-                        await RefreshLobbiesAsync();
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Relay 参加に失敗しました。次のポーリングで再試行します");
-                    }
-                };
+                RefreshJoinedLobbyDisplay();
+                SyncUiState();
+                return;
             }
+
+            await TryJoinRelayFromLobbyAsync();
         }
         catch (LobbyServiceException e)
         {
@@ -424,12 +435,14 @@ public class LobbyManager : MonoBehaviour
     /// </summary>
     private async Task DeleteOwnedLobbiesAsync()
     {
-        string playerId = AuthenticationService.Instance.PlayerId;
-        if (string.IsNullOrEmpty(playerId)) return;
+        if (string.IsNullOrEmpty(CurrentPlayerId))
+        {
+            return;
+        }
 
         try
         {
-            await lobbyApi.DeleteOwnedLobbiesAsync(playerId);
+            await lobbyApi.DeleteOwnedLobbiesAsync(CurrentPlayerId);
         }
         catch (LobbyServiceException e)
         {
@@ -452,7 +465,7 @@ public class LobbyManager : MonoBehaviour
         isLeavingLobby = true;
 
         string lobbyId = joinedLobby.Id;
-        string playerId = AuthenticationService.Instance.PlayerId;
+        string playerId = CurrentPlayerId;
 
         try
         {
@@ -490,5 +503,123 @@ public class LobbyManager : MonoBehaviour
     {
         // 終了時にロビーへ残留しないよう、非同期で離脱または削除を試みる。
         _ = LeaveJoinedLobbyAsync(deleteLobbyIfHost: isHost);
+    }
+
+    /// <summary>
+    /// ロビー作成要求を受け付けてよい状態かを返す。
+    /// 条件式をメソッド名へ押し込むことで、呼び出し側の可読性を上げる。
+    /// </summary>
+    private bool CanCreateLobby()
+    {
+        return isInitialized && !isCreatingLobby && joinedLobby == null;
+    }
+
+    /// <summary>
+    /// 指定ロビーへの参加要求を受け付けてよいかを返す。
+    /// 参加先 null や多重参加をここでまとめて弾く。
+    /// </summary>
+    private bool CanJoinLobby(Lobby lobby)
+    {
+        return isInitialized && !isJoiningLobby && joinedLobby == null && lobby != null;
+    }
+
+    /// <summary>
+    /// ゲーム開始要求を受け付けてよい状態かを返す。
+    /// StartGame 側の条件分岐を短くし、失敗時ログの補助に使う。
+    /// </summary>
+    private bool CanStartGame()
+    {
+        return isInitialized && isHost && joinedLobby != null && !isStartingGame;
+    }
+
+    /// <summary>
+    /// ロビーのポーリングを行うべき状態かを返す。
+    /// 非ホストだけでなく、ホストも最新状態追従のため取得自体は行う。
+    /// </summary>
+    private bool ShouldPollLobby()
+    {
+        return isInitialized && joinedLobby != null;
+    }
+
+    /// <summary>
+    /// ロビー一覧表示用の配列を組み立てる。
+    /// 参加中ロビーがクエリ結果にまだ載っていない場合でも、画面から消えないように補う。
+    /// </summary>
+    private List<Lobby> BuildDisplayLobbyList(IReadOnlyList<Lobby> queryResults)
+    {
+        List<Lobby> displayList = new List<Lobby>(queryResults);
+        if (joinedLobby == null)
+        {
+            Debug.Log("Not joined to any lobby");
+            return displayList;
+        }
+
+        int index = displayList.FindIndex(lobby => lobby.Id == joinedLobby.Id);
+        if (index >= 0)
+        {
+            joinedLobby = displayList[index];
+            return displayList;
+        }
+
+        displayList.Insert(0, joinedLobby);
+        return displayList;
+    }
+
+    /// <summary>
+    /// ホストが参加者変化を検知したときに、自分のロビー表示だけを即時更新する。
+    /// 
+    /// 毎回ロビー一覧を再クエリしなくても、GetLobbyAsync で取得した最新 joinedLobby を
+    /// そのまま一覧 UI へ反映できるため、処理を軽く保ちながら人数表示を追従できる。
+    /// </summary>
+    private void RefreshJoinedLobbyDisplay()
+    {
+        if (joinedLobby == null)
+        {
+            return;
+        }
+
+        eventHandler.Refresh(BuildDisplayLobbyList(new[] { joinedLobby }));
+    }
+
+    /// <summary>
+    /// 非ホスト側でロビー共有データから RelayCode を検出したら接続を開始する。
+    /// 成功後はロビー参照を手放して一覧表示へ戻り、失敗時は次回ポーリングで再試行する。
+    /// </summary>
+    private async Task TryJoinRelayFromLobbyAsync()
+    {
+        if (isJoiningRelayNetwork || !TryGetRelayCode(joinedLobby, out string relayCode))
+        {
+            return;
+        }
+
+        Debug.Log("StartGame");
+        isJoiningRelayNetwork = true;
+        bool joinedRelay = await relayTest.JoinRelayAsync(relayCode);
+        isJoiningRelayNetwork = false;
+
+        if (!joinedRelay)
+        {
+            Debug.LogWarning("Relay 参加に失敗しました。次のポーリングで再試行します");
+            return;
+        }
+
+        joinedLobby = null;
+        await RefreshLobbiesAsync();
+    }
+
+    /// <summary>
+    /// ロビー共有データから RelayCode を安全に取り出す。
+    /// null チェックと初期値 "0" 判定をまとめ、呼び出し側を短くする。
+    /// </summary>
+    private static bool TryGetRelayCode(Lobby lobby, out string relayCode)
+    {
+        relayCode = null;
+        if (lobby == null || lobby.Data == null || !lobby.Data.ContainsKey(KEY_RELAY_CODE))
+        {
+            return false;
+        }
+
+        relayCode = lobby.Data[KEY_RELAY_CODE].Value;
+        return !string.IsNullOrEmpty(relayCode) && relayCode != "0";
     }
 }

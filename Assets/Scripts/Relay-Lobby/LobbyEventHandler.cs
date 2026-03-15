@@ -28,27 +28,47 @@ public class LobbyEventHandler : MonoBehaviour
 
     private void Start()
     {
-        createLobbyButton.onClick.AddListener(() =>
-        {
-            // 二重押下を避けるため、要求送信直前に一旦ボタン状態を絞る。
-            SetControlsInteractable(false, true, false);
-            OnCreateLobbyRequest?.Invoke(this, EventArgs.Empty);
-        });
-
-        refreshButton.onClick.AddListener(() =>
-        {
-            OnRefreshLobbyListRequest?.Invoke(this, EventArgs.Empty);
-        });
-
-        startGameButton.onClick.AddListener(() =>
-        {
-            // 実際の開始可否判定は LobbyManager 側が担当する。
-            Debug.Log("StartGameButton");
-            OnGameStartRequest?.Invoke(this, EventArgs.Empty);
-        });
-
-        // 初期状態ではロビー作成と一覧更新のみ有効にする。
+        BindButtons();
         SetControlsInteractable(true, true, false);
+    }
+
+    /// <summary>
+    /// ボタン入力をイベントへ変換する登録処理をまとめる。
+    /// Start を短く保ちつつ、UI 入力の入口をひと目で追えるようにする。
+    /// </summary>
+    private void BindButtons()
+    {
+        createLobbyButton.onClick.AddListener(HandleCreateLobbyClicked);
+        refreshButton.onClick.AddListener(HandleRefreshClicked);
+        startGameButton.onClick.AddListener(HandleStartGameClicked);
+    }
+
+    /// <summary>
+    /// ロビー作成ボタン押下を上位へ通知する。
+    /// 送信直前に一度ボタンを絞り、連打による多重実行を見た目でも防ぐ。
+    /// </summary>
+    private void HandleCreateLobbyClicked()
+    {
+        SetControlsInteractable(false, true, false);
+        OnCreateLobbyRequest?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// ロビー一覧更新ボタン押下を通知する。
+    /// 実際の取得処理は LobbyManager 側が担当する。
+    /// </summary>
+    private void HandleRefreshClicked()
+    {
+        OnRefreshLobbyListRequest?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// ゲーム開始ボタン押下を通知する。
+    /// 実際の開始可否判定は LobbyManager 側へ委譲する。
+    /// </summary>
+    private void HandleStartGameClicked()
+    {
+        OnGameStartRequest?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -62,7 +82,7 @@ public class LobbyEventHandler : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (var lobby in lobbyList)
+        foreach (Lobby lobby in lobbyList)
         {
             GameObject lobbyBanner = Instantiate(lobbyBannerPrefab, lobbyListContent);
             lobbyBanner.GetComponent<LobbyBanner>().Init(lobby);
