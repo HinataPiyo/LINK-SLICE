@@ -2,7 +2,6 @@ namespace Core
 {
     using UnityEngine;
     using Common;
-    using Unity.Netcode;
 
     public class Health : HealthBase
     {
@@ -11,21 +10,21 @@ namespace Core
         protected override void Initialize()
         {
             coreCtrl = GetComponent<CoreController>();
-            coreCtrl.CoreVisualUpdate();
+            coreCtrl.CoreVisualUpdateClientRpc();
         }
 
         /// <summary>
         /// ダメージを受けると体力が減り、体力が0以下になると死亡する。
         /// </summary>
         /// <param name="damage"></param>
-        public override void TakeDamage(int damage)
+        protected override void TakeDamageInternal(int damage)
         {
             if (IsDead) return;
             if (!IsServer) return;
 
             currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
 
-            coreCtrl.CoreVisualUpdate();     // ダメージを受けたときの処理を呼び出す
+            coreCtrl.CoreVisualUpdateClientRpc();     // ダメージを受けたときの処理を呼び出す
             Debug.Log($"CurrentHealth: {CurrentHealth}, MaxHealth: {MaxHealth}");     // デバッグ用に現在の体力と最大体力をログに出す
 
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合

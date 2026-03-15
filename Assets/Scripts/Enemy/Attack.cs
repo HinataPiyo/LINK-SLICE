@@ -33,7 +33,7 @@ namespace Enemy
             elapsedTime += Time.deltaTime;          // 経過時間を更新
             if(elapsedTime >= attackRate)           // 攻撃の頻度に達した場合
             {
-                damageableTarget.TakeDamage(strength);          // ダメージを与える
+                damageableTarget.ApplyDamage(strength);          // ダメージを与える
                 Reset();
             }
         }

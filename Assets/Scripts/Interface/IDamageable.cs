@@ -5,6 +5,6 @@ public interface IDamageable
     /// ダメージを受ける処理
     /// </summary>
     /// <param name="damage">受けるダメージの量</param>
-    void TakeDamage(int damage);
+    void ApplyDamage(int damage);
     void Die();
 }

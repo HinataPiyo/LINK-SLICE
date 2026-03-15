@@ -14,7 +14,8 @@ namespace Common
         public int CurrentHealth => IsSpawned ? currentHealth.Value : maxHealth;
         public bool IsDead { get; private set; } = false;
 
-        void Awake()
+
+        void Start()
         {
             Initialize();
         }
@@ -23,12 +24,10 @@ namespace Common
         {
             base.OnNetworkSpawn();
 
-            if (!IsServer)
+            if (IsServer)
             {
-                return;
-            }
-
-            currentHealth.Value = maxHealth;
+                currentHealth.Value = maxHealth;
+            }            
         }
 
         /// <summary>
@@ -40,7 +39,16 @@ namespace Common
         /// <summary>
         /// IDamageable インターフェースの TakeDamage メソッドの実装。
         /// </summary>
-        public abstract void TakeDamage(int damage);
+        protected abstract void TakeDamageInternal(int damage);
+
+        public void ApplyDamage(int damage)
+        {
+            if (!IsServer) return;
+            if (!IsSpawned) return;
+            if (IsDead) return;
+
+            TakeDamageInternal(damage);
+        }
 
         /// <summary>
         /// 死亡状態へ遷移する共通処理。
@@ -53,13 +61,6 @@ namespace Common
             IsDead = true;
 
             PlayDieEffectClientRpc();
-
-            if (NetworkObject != null && NetworkObject.IsSpawned)
-            {
-                // ネットワーク生成された敵はサーバーから Despawn し、全クライアントに削除を伝播させる。
-                NetworkObject.Despawn(true);
-                return;
-            }
         }
 
         /// <summary>
@@ -71,6 +72,7 @@ namespace Common
         [ClientRpc]
         void PlayDieEffectClientRpc()
         {
+            Destroy(gameObject);
             PlayDieEffect();
         }
 

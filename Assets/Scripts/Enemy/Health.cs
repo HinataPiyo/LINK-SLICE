@@ -12,7 +12,7 @@ namespace Enemy
             
         }
 
-        public override void TakeDamage(int damage)
+        protected override void TakeDamageInternal(int damage)
         {
             if (IsDead) return;
             if (!IsServer) return;

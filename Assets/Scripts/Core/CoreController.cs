@@ -12,7 +12,7 @@ namespace Core
         [Header("四角が回転するための設定")]
         [SerializeField] float squareRotationSpeed = 10f;   // 回転速度
         [SerializeField] Transform squareTransform;         // 回転させる四角のTransform
-        
+
         Health health;
 
         void Awake()
@@ -36,13 +36,22 @@ namespace Core
         /// <summary>
         /// コアのビジュアルを更新する処理
         /// </summary>
-        public void CoreVisualUpdate()
+        void CoreVisualUpdate()
         {
             if (energyCircleTransform == null) return;
 
             float energyRatio = (float)health.CurrentHealth / health.MaxHealth;     // エネルギーの割合を計算
             Debug.Log($"CurrentHealth: {health.CurrentHealth}, MaxHealth: {health.MaxHealth}, EnergyRatio: {energyRatio}");
             energyCircleTransform.localScale = new Vector3(energyRatio, energyRatio, 1f);
+        }
+
+        /// <summary>
+        /// コアのビジュアルを更新するためのRPC。サーバーから全クライアントに向けて呼び出される。
+        /// </summary>
+        [ClientRpc]
+        public void CoreVisualUpdateClientRpc()
+        {
+            CoreVisualUpdate();
         }
     }
 }

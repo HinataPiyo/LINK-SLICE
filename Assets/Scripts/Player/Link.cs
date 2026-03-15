@@ -171,7 +171,7 @@ namespace PlayerSystem.Link
         /// </summary>
         void OnAttack(IDamageable damageableTarget)
         {
-            damageableTarget.TakeDamage(1);
+            damageableTarget.ApplyDamage(1);
         }
     }
 }
