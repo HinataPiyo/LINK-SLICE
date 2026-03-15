@@ -9,7 +9,7 @@ namespace PlayerSystem
 
         void Update()
         {
-            //! if (!IsOwner) return;        // 自分のプレイヤーオブジェクトでなければ、以降の処理をスキップ
+            if (!IsOwner) return;        // 自分のプレイヤーオブジェクトでなければ、以降の処理をスキップ
 
             if (!TryGetMouseWorldPosition(out Vector3 mouseWorldPosition))
             {

@@ -22,7 +22,6 @@ namespace Core
 
         void Update()
         {
-            //! if(!IsServer) return;        // サーバーでなければ、以降の処理をスキップ
             SquareRotationUpdate();
         }
 

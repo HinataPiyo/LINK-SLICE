@@ -1,3 +1,4 @@
+using Unity.Netcode;
 public interface IDamageable
 {
     /// <summary>

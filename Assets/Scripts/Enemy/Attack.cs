@@ -1,8 +1,9 @@
 namespace Enemy
 {
     using UnityEngine;
+    using Unity.Netcode;
     
-    public class Attack : MonoBehaviour
+    public class Attack : NetworkBehaviour 
     {
         [SerializeField] int strength = 1;     // 攻撃の強さ
         [SerializeField] float attackRate = 1f;     // 攻撃の頻度（1秒あたりの攻撃回数）
@@ -25,6 +26,7 @@ namespace Enemy
 
         void Update()
         {
+            if(!IsServer) return;            // サーバーでなければ、以降の処理をスキップ
             if(!IsAtatcking) return;                // 攻撃していない場合は、以降の処理をスキップ
             if(damageableTarget == null) return;    // ダメージを与える対象がいない場合は、以降の処理をスキップ
 
