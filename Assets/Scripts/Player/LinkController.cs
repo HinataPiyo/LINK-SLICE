@@ -110,12 +110,25 @@ namespace PlayerSystem.Link
             }
         }
 
+        /// <summary>
+        /// 2つのTransformがリンク可能な距離にあるかどうか
+        /// </summary>
+        /// <param name="source"> リンクの発信元</param>
+        /// <param name="target"> リンクの接続先</param>
+        /// <returns> リンク可能な距離にある場合はtrue、そうでない場合はfalse</returns>
         bool IsWithinLinkRange(Transform source, Transform target)
         {
             Vector3 delta = target.position - source.position;
             return delta.sqrMagnitude <= targetDistanceSqr;
         }
 
+        /// <summary>
+        /// 2つのTransformからペアキーを作成する。
+        /// ペアキーは2つのTransformの組み合わせを一意に識別するための値で、順序に依存しない。
+        /// </summary>
+        /// <param name="first"> リンクの一方</param>
+        /// <param name="second"> リンクのもう一方</param>
+        /// <returns> ペアキー</returns>
         long CreatePairKey(Transform first, Transform second)
         {
             int firstId = first.GetInstanceID();

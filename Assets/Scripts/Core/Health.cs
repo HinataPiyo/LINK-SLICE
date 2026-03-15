@@ -20,6 +20,9 @@ namespace Core
         /// <param name="damage"></param>
         public override void TakeDamage(int damage)
         {
+            if (IsDead) return;
+            if (!IsServer) return;
+
             currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
 
             coreCtrl.CoreVisualUpdate();     // ダメージを受けたときの処理を呼び出す

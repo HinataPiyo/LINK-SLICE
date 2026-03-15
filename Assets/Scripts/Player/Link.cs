@@ -1,12 +1,13 @@
 namespace PlayerSystem.Link
 {
     using Common;
+    using Unity.Netcode;
     using UnityEngine;
 
     /// <summary>
     /// プレイヤーとプレイヤーをつなぐ線を描画するクラス
     /// </summary>
-    public class Link : MonoBehaviour
+    public class Link : NetworkBehaviour
     {
         [SerializeField] LayerMask targetLayer;
         [SerializeField] float maxLineWidth = 0.15f;
@@ -55,6 +56,10 @@ namespace PlayerSystem.Link
             linkEffect.BeginFadeOut();      // 切断開始と同時にエフェクトのフェードアウトも始める
         }
 
+        /// <summary>
+        /// 切断開始後、線の幅が十分に小さくなり
+        /// かつエフェクトのフェードアウトが完了したタイミングで切断完了とみなす
+        /// </summary>
         void CancelBreak()
         {
             isBreaking = false;
@@ -93,7 +98,11 @@ namespace PlayerSystem.Link
                 float angle = Mathf.Atan2(targetPos.y - selfPos.y, targetPos.x - selfPos.x) * Mathf.Rad2Deg;
                 float length = Vector2.Distance(selfPos, targetPos);
                 linkEffect.UpdateVisual(center, angle, length);
-                GetHitCollider(angle, length);
+
+                if (IsServer)
+                {
+                    GetHitCollider(angle, length);      // 毎フレーム攻撃判定を更新する（攻撃の当たり判定は線の中心から線の長さ分の距離にある円形の範囲とする）
+                }
             }
             else
             {
@@ -104,7 +113,7 @@ namespace PlayerSystem.Link
 
             if (isLinkActive)
             {
-                PlayLinkEffect();
+                PlayLinkEffect();       // 接続中は常にエフェクトを再生する
             }
 
             // enabledの瞬間切り替えではなく、幅を補間して自然に表示/非表示する

@@ -19,9 +19,15 @@ namespace Common
             Initialize();
         }
 
-        void Start()
+        public override void OnNetworkSpawn()
         {
-            if(!IsServer) return;
+            base.OnNetworkSpawn();
+
+            if (!IsServer)
+            {
+                return;
+            }
+
             currentHealth.Value = maxHealth;
         }
 

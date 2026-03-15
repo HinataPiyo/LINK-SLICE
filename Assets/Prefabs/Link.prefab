@@ -4858,8 +4858,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2054205893260059428}
   - component: {fileID: 1198806684681842532}
-  - component: {fileID: 2980094787936113168}
   - component: {fileID: 7487675935115436982}
+  - component: {fileID: 2980094787936113168}
   - component: {fileID: 2585206316543653826}
   m_Layer: 0
   m_Name: Link
@@ -4991,25 +4991,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &2980094787936113168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6625668693239866367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62b3013291fe1a9499eb21aeab2ffe3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  maxLineWidth: 0.15
-  growDuration: 0.2
-  shrinkDuration: 0.3
-  maxAnimationDeltaTime: 0.016666668
 --- !u!114 &7487675935115436982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5035,6 +5016,26 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &2980094787936113168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6625668693239866367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62b3013291fe1a9499eb21aeab2ffe3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  maxLineWidth: 0.15
+  growDuration: 0.2
+  shrinkDuration: 0.3
+  maxAnimationDeltaTime: 0.016666668
 --- !u!114 &2585206316543653826
 MonoBehaviour:
   m_ObjectHideFlags: 0
