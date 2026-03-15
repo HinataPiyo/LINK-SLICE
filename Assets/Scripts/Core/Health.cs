@@ -10,7 +10,6 @@ namespace Core
         protected override void Initialize()
         {
             coreCtrl = GetComponent<CoreController>();
-            coreCtrl.CoreVisualUpdateClientRpc();
         }
 
         /// <summary>

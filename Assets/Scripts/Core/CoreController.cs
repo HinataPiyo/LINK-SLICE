@@ -1,6 +1,8 @@
 namespace Core
 {
+    using System.Runtime.Serialization.Json;
     using Unity.Netcode;
+    using Unity.VisualScripting;
     using UnityEngine;
 
 
@@ -18,6 +20,13 @@ namespace Core
         void Awake()
         {
             health = GetComponent<Health>();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (!IsClient) return;   // クライアントでのみ処理を行う
+            CoreVisualUpdateClientRpc();
         }
 
         void Update()
@@ -51,6 +60,8 @@ namespace Core
         [ClientRpc]
         public void CoreVisualUpdateClientRpc()
         {
+            if(!IsSpawned) return;  // オブジェクトがスポーンされていない場合は処理を行わない
+            if(!IsClient) return;   // クライアントでのみ処理を行う
             CoreVisualUpdate();
         }
     }
