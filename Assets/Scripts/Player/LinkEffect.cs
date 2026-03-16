@@ -1,4 +1,4 @@
-namespace Player.Link
+namespace PlayerSystem.Link
 {
     using UnityEngine;
     
@@ -52,13 +52,17 @@ namespace Player.Link
             // フェードアウト中に再生が要求された場合は、フェードアウトをキャンセルして放出量を元に戻す
             if (isFadingOut) isFadingOut = false;
 
+            fadeTimer = 0f;
             IsFadeOutFinished = false;
 
             // 放出量を元に戻す
             var emission = ps.emission;
             emission.rateOverTimeMultiplier = baseRateOverTimeMultiplier;
 
-            if (!ps.isPlaying) ps.Play();
+            if (!ps.isPlaying || !ps.isEmitting)
+            {
+                ps.Play();
+            }
         }
 
         /// <summary>

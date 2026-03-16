@@ -1,4 +1,4 @@
-namespace Player.Link
+namespace PlayerSystem.Link
 {
     using System.Collections.Generic;
     using System.Collections;
@@ -14,9 +14,9 @@ namespace Player.Link
         [SerializeField] float targetDistance = 8f;     // ターゲットとの距離がこの値を超えたらリンクを切る
         [SerializeField] Transform spawnParent;     // Linkを生成する親オブジェクト（未設定ならこのオブジェクトの子として生成）
 
-        readonly Dictionary<int, LinkRuntime> linkRuntimes = new Dictionary<int, LinkRuntime>();
+        readonly Dictionary<long, LinkRuntime> linkRuntimes = new Dictionary<long, LinkRuntime>();
         readonly List<Transform> players = new List<Transform>();
-        readonly HashSet<int> activePlayerKeys = new HashSet<int>();
+        readonly HashSet<long> activePairKeys = new HashSet<long>();
 
         float targetDistanceSqr;
 
@@ -26,6 +26,7 @@ namespace Player.Link
             public Transform target;
             public Link spawnedLink;
             public Coroutine breakRoutine;
+            public bool pendingRemoval;
         }
 
         void Awake()
@@ -69,102 +70,86 @@ namespace Player.Link
         /// </summary>
         void UpdateLinks()
         {
-            activePlayerKeys.Clear();
+            activePairKeys.Clear();
 
             for (int i = 0; i < players.Count; i++)
             {
                 Transform source = players[i];
                 if (source == null) continue;
 
-                int sourceKey = source.GetInstanceID();
-                activePlayerKeys.Add(sourceKey);
+                for (int j = i + 1; j < players.Count; j++)
+                {
+                    Transform target = players[j];
+                    if (target == null) continue;
+                    if (!IsWithinLinkRange(source, target)) continue;
 
-                if (!linkRuntimes.TryGetValue(sourceKey, out LinkRuntime runtime))
-                {
-                    runtime = new LinkRuntime { source = source };
-                    linkRuntimes.Add(sourceKey, runtime);
-                }
-                else
-                {
+                    long pairKey = CreatePairKey(source, target);
+                    activePairKeys.Add(pairKey);
+
+                    if (!linkRuntimes.TryGetValue(pairKey, out LinkRuntime runtime))
+                    {
+                        runtime = new LinkRuntime();
+                        linkRuntimes.Add(pairKey, runtime);
+                    }
+
                     runtime.source = source;
+                    runtime.target = target;
+                    runtime.pendingRemoval = false;
+                    ResumeOrCreateLink(runtime);
                 }
-
-                runtime.target = FindNearestTarget(source, players);
-
-                if (ShouldBreakLink(runtime))
-                {
-                    StartBreakIfNeeded(sourceKey, runtime);     // すぐに切るのではなく、破棄演出を走らせてから切る
-                    continue;
-                }
-
-                ResumeOrCreateLink(runtime);
             }
 
-            // すでにいないプレイヤーのリンクは破棄演出へ遷移させる
-            List<int> keys = new List<int>(linkRuntimes.Keys);
-            for (int i = 0; i < keys.Count; i++)
+            List<long> pairKeys = new List<long>(linkRuntimes.Keys);
+            for (int i = 0; i < pairKeys.Count; i++)
             {
-                int key = keys[i];
-                if (activePlayerKeys.Contains(key)) continue;
+                long pairKey = pairKeys[i];
+                if (activePairKeys.Contains(pairKey)) continue;
 
-                LinkRuntime runtime = linkRuntimes[key];
-                runtime.source = null;
-                runtime.target = null;
-
-                if (runtime.spawnedLink == null)
-                {
-                    linkRuntimes.Remove(key);
-                    continue;
-                }
-
-                StartBreakIfNeeded(key, runtime);
+                LinkRuntime runtime = linkRuntimes[pairKey];
+                UpdateBreakingLinkTransform(runtime);
+                runtime.pendingRemoval = true;
+                StartBreakIfNeeded(pairKey, runtime);
             }
         }
 
         /// <summary>
-        /// sourceに対して、candidatesの中で最も近いTransformを返す。
+        /// 2つのTransformがリンク可能な距離にあるかどうか
         /// </summary>
-        Transform FindNearestTarget(Transform source, List<Transform> candidates)
+        /// <param name="source"> リンクの発信元</param>
+        /// <param name="target"> リンクの接続先</param>
+        /// <returns> リンク可能な距離にある場合はtrue、そうでない場合はfalse</returns>
+        bool IsWithinLinkRange(Transform source, Transform target)
         {
-            Transform nearest = null;
-            float nearestSqr = float.MaxValue;
-
-            Vector3 sourcePos = source.position;
-            for (int i = 0; i < candidates.Count; i++)
-            {
-                Transform candidate = candidates[i];
-                if (candidate == null || candidate == source) continue;
-
-                float sqr = (candidate.position - sourcePos).sqrMagnitude;
-                if (sqr >= nearestSqr) continue;
-
-                nearest = candidate;
-                nearestSqr = sqr;
-            }
-
-            return nearest;
+            Vector3 delta = target.position - source.position;
+            return delta.sqrMagnitude <= targetDistanceSqr;
         }
 
         /// <summary>
-        /// runtimeのsourceとtargetの距離がtargetDistanceを超えているかどうかを返す。
+        /// 2つのTransformからペアキーを作成する。
+        /// ペアキーは2つのTransformの組み合わせを一意に識別するための値で、順序に依存しない。
         /// </summary>
-        bool ShouldBreakLink(LinkRuntime runtime)
+        /// <param name="first"> リンクの一方</param>
+        /// <param name="second"> リンクのもう一方</param>
+        /// <returns> ペアキー</returns>
+        long CreatePairKey(Transform first, Transform second)
         {
-            if (runtime.source == null || runtime.target == null) return true;
+            int firstId = first.GetInstanceID();
+            int secondId = second.GetInstanceID();
+            int minId = Mathf.Min(firstId, secondId);
+            int maxId = Mathf.Max(firstId, secondId);
 
-            Vector3 delta = runtime.target.position - runtime.source.position;
-            return delta.sqrMagnitude > targetDistanceSqr;
+            return ((long)(uint)minId << 32) | (uint)maxId;
         }
 
         /// <summary>
-        /// runtimeのリンクを切る必要がある場合に、破棄演出を開始する。
+        /// リンクを切る必要がある場合に、破棄演出を開始する。
         /// </summary>
-        void StartBreakIfNeeded(int sourceKey, LinkRuntime runtime)
+        void StartBreakIfNeeded(long pairKey, LinkRuntime runtime)
         {
             // 破棄演出は1本だけ走らせる
             if (runtime.spawnedLink == null || runtime.breakRoutine != null) return;
 
-            runtime.breakRoutine = StartCoroutine(BreakAndDespawnCoroutine(sourceKey, runtime));
+            runtime.breakRoutine = StartCoroutine(BreakAndDespawnCoroutine(pairKey, runtime));
         }
 
         /// <summary>
@@ -180,16 +165,27 @@ namespace Player.Link
                 runtime.breakRoutine = null;
             }
 
-            // ターゲットがいない場合は何もしない
             if (runtime.spawnedLink == null)
             {
                 SpawnLink(runtime);
-                return;
             }
 
-            // すでに接続されている場合は何もしない
+            UpdateLinkTransform(runtime);
+        }
+
+        void UpdateLinkTransform(LinkRuntime runtime)
+        {
+            if (runtime.spawnedLink == null || runtime.source == null || runtime.target == null) return;
+
             runtime.spawnedLink.transform.position = runtime.source.position;
             runtime.spawnedLink.SetTarget(runtime.target);
+        }
+
+        void UpdateBreakingLinkTransform(LinkRuntime runtime)
+        {
+            if (runtime.spawnedLink == null || runtime.source == null) return;
+
+            runtime.spawnedLink.transform.position = runtime.source.position;
         }
 
         /// <summary>
@@ -264,7 +260,7 @@ namespace Player.Link
         /// <summary>
         /// リンク切断を開始してから、破棄演出が終わるまで待ってからLinkを破棄するコルーチン
         /// </summary>
-        IEnumerator BreakAndDespawnCoroutine(int sourceKey, LinkRuntime runtime)
+        IEnumerator BreakAndDespawnCoroutine(long pairKey, LinkRuntime runtime)
         {
             if (runtime.spawnedLink == null)
             {
@@ -277,20 +273,17 @@ namespace Player.Link
             // 破棄演出が終わるまで待つ
             while (runtime.spawnedLink != null && !runtime.spawnedLink.IsBreakFinished)
             {
-                if (runtime.source != null)
-                {
-                    runtime.spawnedLink.transform.position = runtime.source.position;
-                }
-
                 yield return null;
             }
 
             DespawnLink(runtime);       // Linkを破棄する
             runtime.breakRoutine = null;
 
-            if (runtime.source == null)
+            if (runtime.pendingRemoval)
             {
-                linkRuntimes.Remove(sourceKey);
+                runtime.source = null;
+                runtime.target = null;
+                linkRuntimes.Remove(pairKey);
             }
         }
     }

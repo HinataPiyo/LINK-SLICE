@@ -1,12 +1,13 @@
-namespace Player.Link
+namespace PlayerSystem.Link
 {
     using Common;
+    using Unity.Netcode;
     using UnityEngine;
 
     /// <summary>
     /// プレイヤーとプレイヤーをつなぐ線を描画するクラス
     /// </summary>
-    public class Link : MonoBehaviour
+    public class Link : NetworkBehaviour
     {
         [SerializeField] LayerMask targetLayer;
         [SerializeField] float maxLineWidth = 0.15f;
@@ -30,7 +31,15 @@ namespace Player.Link
         /// <summary>
         /// 外部から接続先ターゲットを設定する
         /// </summary>
-        public void SetTarget(Transform newTarget) => target = newTarget;
+        public void SetTarget(Transform newTarget)
+        {
+            target = newTarget;
+
+            if (newTarget != null && isBreaking)
+            {
+                CancelBreak();
+            }
+        }
 
         /// <summary>
         /// リンク切断を開始する（幅0到達後にLinkBrokenを通知）
@@ -43,7 +52,19 @@ namespace Player.Link
             }
 
             isBreaking = true;
+            notifiedBroken = false;
             linkEffect.BeginFadeOut();      // 切断開始と同時にエフェクトのフェードアウトも始める
+        }
+
+        /// <summary>
+        /// 切断開始後、線の幅が十分に小さくなり
+        /// かつエフェクトのフェードアウトが完了したタイミングで切断完了とみなす
+        /// </summary>
+        void CancelBreak()
+        {
+            isBreaking = false;
+            notifiedBroken = false;
+            linkEffect.EnsurePlaying();
         }
 
         void Awake()
@@ -56,6 +77,7 @@ namespace Player.Link
 
             lineRenderer.startWidth = 0f;
             lineRenderer.endWidth = 0f;
+            lineRenderer.positionCount = 0;
             lineRenderer.enabled = false;
         }
 
@@ -63,29 +85,32 @@ namespace Player.Link
         {
             if (lineRenderer == null) return;
 
-            // 破棄される直前まで、線の始点/終点は追従させ続ける
+            // 接続先が存在し、かつ切断中でない間だけリンクを有効にする
             if (target != null)
             {
-                // 線の両端を自分とターゲットの位置にする
                 Vector3 selfPos = transform.position;
                 Vector3 targetPos = target.position;
+                lineRenderer.positionCount = 2;
                 lineRenderer.SetPosition(0, selfPos);
                 lineRenderer.SetPosition(1, targetPos);
 
-                // 線と同じ幾何情報でエフェクトの見た目も毎フレーム同期する
                 Vector2 center = (selfPos + targetPos) * 0.5f;
                 float angle = Mathf.Atan2(targetPos.y - selfPos.y, targetPos.x - selfPos.x) * Mathf.Rad2Deg;
                 float length = Vector2.Distance(selfPos, targetPos);
                 linkEffect.UpdateVisual(center, angle, length);
-                GetHitCollider(angle, length);
+
+                GetHitCollider(angle, length);      // 毎フレーム攻撃判定を更新する（攻撃の当たり判定は線の中心から線の長さ分の距離にある円形の範囲とする）
+            }
+            else
+            {
+                lineRenderer.positionCount = 0;
             }
 
-            // 接続先が存在し、かつ切断中でない間だけリンクを有効にする
             isLinkActive = target != null && !isBreaking;
 
             if (isLinkActive)
             {
-                PlayLinkEffect();
+                PlayLinkEffect();       // 接続中は常にエフェクトを再生する
             }
 
             // enabledの瞬間切り替えではなく、幅を補間して自然に表示/非表示する
@@ -130,20 +155,19 @@ namespace Player.Link
             RaycastHit2D hit = Physics2D.Raycast(origin, dir, distance, targetLayer);
             Debug.DrawRay(origin, dir * distance, Color.red, 0.1f);
 
-            if (hit.collider != null)
+            if (hit.collider != null && hit.collider.TryGetComponent(out IDamageable damageableTarget))
             {
-                Health targetHealth = hit.collider.GetComponent<Health>();
-                if (targetHealth == null) return;
-                OnAttack(targetHealth);
+                if (damageableTarget == null) return;
+                OnAttack(damageableTarget);
             }
         }
 
         /// <summary>
         /// 攻撃処理。Healthコンポーネントを持つオブジェクトに対してダメージを与える
         /// </summary>
-        void OnAttack(Health targetHealth)
+        void OnAttack(IDamageable damageableTarget)
         {
-            targetHealth.TakeDamage(1);
+            damageableTarget.ApplyDamage(1);
         }
     }
 }

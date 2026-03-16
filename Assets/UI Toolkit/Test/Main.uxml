@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="root" picking-mode="Ignore" style="flex-grow: 1; flex-direction: row;">
+        <ui:VisualElement name="DebugUIParent" picking-mode="Ignore" style="height: 100%; width: 65%;" />
+        <ui:Label name="SignalInformation" picking-mode="Ignore" style="flex-grow: 1; height: 20%; -unity-text-align: upper-right; color: rgb(255, 0, 0); font-size: 42px; -unity-font-style: bold; padding-top: 44px; padding-right: 44px; padding-bottom: 44px; padding-left: 44px;" />
+    </ui:VisualElement>
+</ui:UXML>
