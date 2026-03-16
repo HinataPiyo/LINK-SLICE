@@ -3,7 +3,6 @@ namespace Enemy
     using UnityEngine;
     using Unity.Netcode;
     
-    [RequireComponent(typeof(Attack))]
     [RequireComponent(typeof(Health))]
     [RequireComponent(typeof(Movement))]
     [RequireComponent(typeof(GetTarget))]

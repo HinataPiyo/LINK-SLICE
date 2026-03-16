@@ -26,6 +26,7 @@ namespace PlayerSystem.Link
             public Transform target;
             public Link spawnedLink;
             public Coroutine breakRoutine;
+            public bool pendingRemoval;
         }
 
         void Awake()
@@ -93,6 +94,7 @@ namespace PlayerSystem.Link
 
                     runtime.source = source;
                     runtime.target = target;
+                    runtime.pendingRemoval = false;
                     ResumeOrCreateLink(runtime);
                 }
             }
@@ -104,8 +106,8 @@ namespace PlayerSystem.Link
                 if (activePairKeys.Contains(pairKey)) continue;
 
                 LinkRuntime runtime = linkRuntimes[pairKey];
-                runtime.source = null;
-                runtime.target = null;
+                UpdateBreakingLinkTransform(runtime);
+                runtime.pendingRemoval = true;
                 StartBreakIfNeeded(pairKey, runtime);
             }
         }
@@ -168,10 +170,22 @@ namespace PlayerSystem.Link
                 SpawnLink(runtime);
             }
 
+            UpdateLinkTransform(runtime);
+        }
+
+        void UpdateLinkTransform(LinkRuntime runtime)
+        {
             if (runtime.spawnedLink == null || runtime.source == null || runtime.target == null) return;
 
             runtime.spawnedLink.transform.position = runtime.source.position;
             runtime.spawnedLink.SetTarget(runtime.target);
+        }
+
+        void UpdateBreakingLinkTransform(LinkRuntime runtime)
+        {
+            if (runtime.spawnedLink == null || runtime.source == null) return;
+
+            runtime.spawnedLink.transform.position = runtime.source.position;
         }
 
         /// <summary>
@@ -265,8 +279,10 @@ namespace PlayerSystem.Link
             DespawnLink(runtime);       // Linkを破棄する
             runtime.breakRoutine = null;
 
-            if (runtime.source == null && runtime.target == null)
+            if (runtime.pendingRemoval)
             {
+                runtime.source = null;
+                runtime.target = null;
                 linkRuntimes.Remove(pairKey);
             }
         }

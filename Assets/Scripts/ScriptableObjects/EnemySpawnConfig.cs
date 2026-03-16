@@ -1,17 +1,17 @@
 namespace Enemy
 {
-    using System.Collections.Generic;
     using PlayerSystem;
     using UnityEngine;
     
     public enum SpawnPositionPattern { Random, Grouped }
+    public enum EnemyType { Triangle_Melee, Triangle_LongRange }
 
     [CreateAssetMenu(fileName = "EnemySpawnConfig", menuName = "Config/EnemySpawnConfig")]
     public class EnemySpawnConfig : ScriptableObject
     {
         [Header("1ウェーブあたりの敵の生成設定")]
-        [SerializeField] List<EnemyWaveEntry> entries = new List<EnemyWaveEntry>();    // 敵の生成設定リスト
-        public IReadOnlyList<EnemyWaveEntry> Entries => entries;    // 外部からの読み取り専用プロパティ
+        [SerializeField] EnemyWaveEntry[] entries;
+        public EnemyWaveEntry[] Entries => entries;    // 外部からの読み取り専用プロパティ
 
         public static Vector2 GetSpawnPosition(SpawnPositionPattern pattern, Vector2 centerPos = default)
         {
@@ -57,9 +57,15 @@ namespace Enemy
     [System.Serializable]
     public class EnemyWaveEntry
     {
-        public GameObject enemyPrefab;
-        public SpawnPositionPattern spawnPattern;    // 生成位置のパターン
-        [Range(1, 100)] public int spawnCount;                              // 生成数
-        [Tooltip("個々の敵の生成間隔"), Range(0.1f, 3f)] public float spawnInterval;      // 生成間隔
+        public Composition[] compositions;    // 1ウェーブあたりの生成構成の配列
+
+        [System.Serializable]
+        public class Composition
+        {
+            public EnemyType enemyType;
+            public SpawnPositionPattern spawnPattern;    // 生成位置のパターン
+            [Range(1, 100)] public int spawnCount;                              // 生成数
+            [Tooltip("個々の敵の生成間隔"), Range(0.1f, 3f)] public float spawnInterval;      // 生成間隔
+        }
     }
 }

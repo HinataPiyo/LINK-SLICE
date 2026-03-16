@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Enemy_Triangle
+  m_Name: Enemy_Triangle_Melee
   m_Shader: {fileID: -6465566751694194690, guid: 991aa1081cc8ed1458f04f6d82f6eff6, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

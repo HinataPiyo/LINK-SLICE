@@ -1,6 +1,8 @@
-using Unity.Netcode;
+using UnityEngine;
+
 public interface IDamageable
 {
+    Vector2 GetPosition();
     /// <summary>
     /// ダメージを受ける処理
     /// </summary>

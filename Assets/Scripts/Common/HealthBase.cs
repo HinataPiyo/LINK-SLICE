@@ -4,6 +4,7 @@ namespace Common
     using UnityEngine;
     using Unity.Netcode;
 
+
     public abstract class HealthBase : NetworkBehaviour, IDamageable
     {
         [SerializeField] protected int maxHealth = 1;
@@ -11,6 +12,14 @@ namespace Common
         protected NetworkVariable<int> currentHealth = new NetworkVariable<int>();
 
         public int MaxHealth => maxHealth;
+        public Vector2 GetPosition()
+        {
+            if(!IsSpawned)
+            {
+                return Vector2.zero;
+            }
+            return transform.position;
+        }
         public int CurrentHealth => IsSpawned ? currentHealth.Value : maxHealth;
         public bool IsDead { get; private set; } = false;
 
@@ -27,7 +36,7 @@ namespace Common
             if (IsServer)
             {
                 currentHealth.Value = maxHealth;
-            }            
+            }
         }
 
         /// <summary>

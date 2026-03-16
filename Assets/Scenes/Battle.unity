@@ -303,7 +303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1712939256010682450, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393498214897682015, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_Enabled
@@ -543,6 +543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 606887f547b9b6848bb990c58a0df229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyContainer: {fileID: 11400000, guid: fd30bb1f5f17e864bb033ef8ddc1233b, type: 2}
   spawnConfigs:
   - {fileID: 11400000, guid: bdab0a8dde439ec4d8aabbc2ff4bc91a, type: 2}
 --- !u!1 &666217345
@@ -842,7 +843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1712939256010682450, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393498214897682015, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_Enabled
@@ -1203,7 +1204,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1712939256010682450, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393498214897682015, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_Enabled

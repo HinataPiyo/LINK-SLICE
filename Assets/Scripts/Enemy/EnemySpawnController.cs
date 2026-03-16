@@ -8,6 +8,7 @@ namespace Enemy
     public class EnemySpawnController : MonoBehaviour
     {
         public static EnemySpawnController I { get; private set; }     // シングルトンインスタンス
+        [SerializeField] EnemyContainer enemyContainer;     // 敵のプレハブを管理するコンテナ
         [SerializeField] EnemySpawnConfig[] spawnConfigs;
         public List<GameObject> ActiveEnemies { get; private set; } = new List<GameObject>();     // 現在アクティブな敵のリスト
 
@@ -33,26 +34,30 @@ namespace Enemy
         {
             foreach (EnemySpawnConfig config in spawnConfigs)
             {
-                foreach (EnemyWaveEntry entry in config.Entries)
+                foreach (EnemyWaveEntry entries in config.Entries)
                 {
-                    SpawnPositionPattern pattern = entry.spawnPattern;
-
-                    for (int i = 0; i < entry.spawnCount; i++)
+                    foreach (EnemyWaveEntry.Composition c in entries.compositions)
                     {
-                        // 敵の生成パターンがグループだった場合
-                        if (pattern == SpawnPositionPattern.Grouped)
+                        SpawnPositionPattern pattern = c.spawnPattern;
+
+                        for (int i = 0; i < c.spawnCount; i++)
                         {
-                            Spawn(entry.enemyPrefab, pattern);
-                            yield return null;
-                        }
-                        else if (pattern == SpawnPositionPattern.Random)     // 敵の生成パターンがランダムだった場合
-                        {
-                            Spawn(entry.enemyPrefab, pattern);
-                            yield return new WaitForSeconds(entry.spawnInterval);     // 個々の敵の生成間隔を待機
+                            // 敵の生成パターンがグループだった場合
+                            if (pattern == SpawnPositionPattern.Grouped)
+                            {
+                                Spawn(c.enemyType, pattern);
+                                yield return null;
+                            }
+                            else if (pattern == SpawnPositionPattern.Random)     // 敵の生成パターンがランダムだった場合
+                            {
+                                Spawn(c.enemyType, pattern);
+                                yield return new WaitForSeconds(c.spawnInterval);     // 個々の敵の生成間隔を待機
+                            }
                         }
                     }
 
                     yield return new WaitUntil(() => ActiveEnemies.Count == 0);    // 生成された敵が全て倒されるまで待機
+
                 }
             }
         }
@@ -60,7 +65,7 @@ namespace Enemy
         /// <summary>
         /// 敵の生成処理
         /// </summary>
-        void Spawn(GameObject enemy, SpawnPositionPattern pattern)
+        void Spawn(EnemyType enemy, SpawnPositionPattern pattern)
         {
             Vector3 spawnPos;
             if (ActiveEnemies.Count == 0)        // 最初の敵を生成するときはランダムな位置に生成
@@ -81,7 +86,7 @@ namespace Enemy
                 }
             }
 
-            GameObject spawnedEnemy = Instantiate(enemy, spawnPos, Quaternion.identity);
+            GameObject spawnedEnemy = Instantiate(enemyContainer.GetEnemyPrefab(enemy), spawnPos, Quaternion.identity);
 
             NetworkObject networkObject = spawnedEnemy.GetComponent<NetworkObject>();
             if (networkObject != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && !networkObject.IsSpawned)
