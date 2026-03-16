@@ -77,6 +77,8 @@ public class LobbyEventHandler : MonoBehaviour
     /// </summary>
     public void Refresh(List<Lobby> lobbyList)
     {
+        if(lobbyListContent == null) return;
+        
         foreach (Transform child in lobbyListContent)
         {
             Destroy(child.gameObject);

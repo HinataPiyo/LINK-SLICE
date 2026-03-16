@@ -15,7 +15,7 @@ public class LobbyManager : MonoBehaviour
     // ロビー参加者に対して Relay の JoinCode を共有するためのキー。
     public const string KEY_RELAY_CODE = "RelayCode";
     // ゲーム開始ボタンを有効にする最少人数。
-    private const int MIN_PLAYERS_TO_START = 2;
+    private const int MIN_PLAYERS_TO_START = 1;
     // ホストが Lobby Service へ生存通知を送る間隔。
     private const float HEARTBEAT_INTERVAL = 15f;
     // 非ホスト側がロビー状態を取り直す間隔。

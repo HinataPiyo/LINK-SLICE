@@ -14,8 +14,8 @@ namespace Enemy
 
         protected override void TakeDamageInternal(int damage)
         {
-            if (IsDead) return;
             if (!IsServer) return;
+            if (IsDead) return;
 
             currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合

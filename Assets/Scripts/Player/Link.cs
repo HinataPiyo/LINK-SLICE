@@ -99,10 +99,7 @@ namespace PlayerSystem.Link
                 float length = Vector2.Distance(selfPos, targetPos);
                 linkEffect.UpdateVisual(center, angle, length);
 
-                if (IsServer)
-                {
-                    GetHitCollider(angle, length);      // 毎フレーム攻撃判定を更新する（攻撃の当たり判定は線の中心から線の長さ分の距離にある円形の範囲とする）
-                }
+                GetHitCollider(angle, length);      // 毎フレーム攻撃判定を更新する（攻撃の当たり判定は線の中心から線の長さ分の距離にある円形の範囲とする）
             }
             else
             {
@@ -158,9 +155,8 @@ namespace PlayerSystem.Link
             RaycastHit2D hit = Physics2D.Raycast(origin, dir, distance, targetLayer);
             Debug.DrawRay(origin, dir * distance, Color.red, 0.1f);
 
-            if (hit.collider != null)
+            if (hit.collider != null && hit.collider.TryGetComponent(out IDamageable damageableTarget))
             {
-                IDamageable damageableTarget = hit.collider.GetComponent<IDamageable>();
                 if (damageableTarget == null) return;
                 OnAttack(damageableTarget);
             }

@@ -22,13 +22,6 @@ namespace Core
             health = GetComponent<Health>();
         }
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            if (!IsClient) return;   // クライアントでのみ処理を行う
-            CoreVisualUpdateClientRpc();
-        }
-
         void Update()
         {
             SquareRotationUpdate();
@@ -60,8 +53,8 @@ namespace Core
         [ClientRpc]
         public void CoreVisualUpdateClientRpc()
         {
-            if(!IsSpawned) return;  // オブジェクトがスポーンされていない場合は処理を行わない
-            if(!IsClient) return;   // クライアントでのみ処理を行う
+            if (!IsSpawned) return;  // オブジェクトがスポーンされていない場合は処理を行わない
+            if (!IsClient) return;    // クライアントでない場合は処理を行わない
             CoreVisualUpdate();
         }
     }

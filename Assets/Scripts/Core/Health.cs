@@ -10,6 +10,7 @@ namespace Core
         protected override void Initialize()
         {
             coreCtrl = GetComponent<CoreController>();
+            coreCtrl.CoreVisualUpdateClientRpc();
         }
 
         /// <summary>
@@ -18,13 +19,12 @@ namespace Core
         /// <param name="damage"></param>
         protected override void TakeDamageInternal(int damage)
         {
-            if (IsDead) return;
             if (!IsServer) return;
+            if (IsDead) return;
 
             currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
 
             coreCtrl.CoreVisualUpdateClientRpc();     // ダメージを受けたときの処理を呼び出す
-            Debug.Log($"CurrentHealth: {CurrentHealth}, MaxHealth: {MaxHealth}");     // デバッグ用に現在の体力と最大体力をログに出す
 
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合
             {
