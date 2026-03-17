@@ -15,12 +15,19 @@ MonoBehaviour:
   entries:
   - compositions:
     - enemyType: 0
-      spawnPattern: 1
-      spawnCount: 4
-      spawnInterval: 0
-    - enemyType: 1
       spawnPattern: 0
-      spawnCount: 4
-      spawnInterval: 0
-  - compositions: []
-  - compositions: []
+      spawnCount: 10
+      spawnInterval: 1
+  - compositions:
+    - enemyType: 0
+      spawnPattern: 1
+      spawnCount: 3
+      spawnInterval: 1
+    - enemyType: 0
+      spawnPattern: 1
+      spawnCount: 3
+      spawnInterval: 1.2
+    - enemyType: 0
+      spawnPattern: 1
+      spawnCount: 3
+      spawnInterval: 1.5
