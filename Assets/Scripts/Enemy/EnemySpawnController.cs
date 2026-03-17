@@ -10,6 +10,7 @@ namespace Enemy
         public static EnemySpawnController I { get; private set; }     // シングルトンインスタンス
         [SerializeField] EnemyContainer enemyContainer;     // 敵のプレハブを管理するコンテナ
         [SerializeField] EnemySpawnConfig[] spawnConfigs;
+        [SerializeField] float timeAfterWave = 3f;
         public List<GameObject> ActiveEnemies { get; private set; } = new List<GameObject>();     // 現在アクティブな敵のリスト
 
         void Awake()
@@ -56,8 +57,9 @@ namespace Enemy
                         }
                     }
 
-                    yield return new WaitUntil(() => ActiveEnemies.Count == 0);    // 生成された敵が全て倒されるまで待機
+                    yield return new WaitUntil(() => ActiveEnemies.Count == 0);     // 生成された敵が全て倒されるまで待機
 
+                    yield return new WaitForSeconds(timeAfterWave);         // 次のウェーブまでの時間を待機
                 }
             }
         }
