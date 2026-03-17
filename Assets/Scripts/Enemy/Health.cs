@@ -33,6 +33,7 @@ namespace Enemy
             if (!IsServer) return;
 
             EnemySpawnController.I.RemoveEnemy(gameObject);     // EnemySpawnControllerから敵を削除
+            AudioManager.I.PlaySE("EnemyBreak");     // 敵の破壊音を再生
             base.Die();     // 基底クラスのDie()を呼び出して、死亡エフェクトを出す
         }
     }
