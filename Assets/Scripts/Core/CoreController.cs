@@ -42,7 +42,7 @@ namespace Core
         {
             if (energyCircleTransform == null) return;
 
-            float energyRatio = (float)health.CurrentHealth / health.MaxHealth;     // エネルギーの割合を計算
+            float energyRatio = Mathf.Clamp01((float)health.CurrentHealth / health.MaxHealth);   // 現在の体力と最大体力からエネルギーの割合を計算する
             Debug.Log($"CurrentHealth: {health.CurrentHealth}, MaxHealth: {health.MaxHealth}, EnergyRatio: {energyRatio}");
             energyCircleTransform.localScale = new Vector3(energyRatio, energyRatio, 1f);
         }

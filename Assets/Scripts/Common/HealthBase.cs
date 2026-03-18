@@ -7,11 +7,11 @@ namespace Common
 
     public abstract class HealthBase : NetworkBehaviour, IDamageable
     {
-        [SerializeField] protected int maxHealth = 1;
+        [SerializeField] protected int defaultMaxHealth = 1;
         [SerializeField] Die dieEffectPrefab;
         protected NetworkVariable<int> currentHealth = new NetworkVariable<int>();
 
-        public int MaxHealth => maxHealth;
+        public int MaxHealth;
         public Vector2 GetPosition()
         {
             if(!IsSpawned)
@@ -20,7 +20,7 @@ namespace Common
             }
             return transform.position;
         }
-        public int CurrentHealth => IsSpawned ? currentHealth.Value : maxHealth;
+        public int CurrentHealth => IsSpawned ? currentHealth.Value : MaxHealth;
         public bool IsDead { get; private set; } = false;
 
 
@@ -35,7 +35,8 @@ namespace Common
 
             if (IsServer)
             {
-                currentHealth.Value = maxHealth;
+                MaxHealth = defaultMaxHealth;
+                currentHealth.Value = MaxHealth;
             }
         }
 
