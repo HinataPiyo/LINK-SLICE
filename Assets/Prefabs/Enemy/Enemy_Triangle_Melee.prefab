@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: defaultMaxHealth
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: m_Name
       value: Enemy_Triangle_Melee

@@ -10,8 +10,7 @@ namespace PlayerSystem.Link
         static LinkController instance;
 
         [Header("生成設定")]
-        [SerializeField] Link linkPrefab;
-        [SerializeField] float targetDistance = 8f;     // ターゲットとの距離がこの値を超えたらリンクを切る
+        [SerializeField] PlayerConfig playerConfig;
         [SerializeField] Transform spawnParent;     // Linkを生成する親オブジェクト（未設定ならこのオブジェクトの子として生成）
 
         readonly Dictionary<long, LinkRuntime> linkRuntimes = new Dictionary<long, LinkRuntime>();
@@ -19,6 +18,7 @@ namespace PlayerSystem.Link
         readonly HashSet<long> activePairKeys = new HashSet<long>();
 
         float targetDistanceSqr;
+        float targetDistance;
 
         sealed class LinkRuntime
         {
@@ -39,6 +39,7 @@ namespace PlayerSystem.Link
             }
 
             instance = this;
+            targetDistance = playerConfig.Link.distance;
             targetDistanceSqr = targetDistance * targetDistance;        // 0除算防止
         }
 
@@ -233,7 +234,7 @@ namespace PlayerSystem.Link
         /// </summary>
         void SpawnLink(LinkRuntime runtime)
         {
-            if (linkPrefab == null)
+            if (playerConfig.Link.linkPrefab == null)
             {
                 Debug.LogWarning("Link prefabが未設定です", this);
                 return;
@@ -242,7 +243,7 @@ namespace PlayerSystem.Link
             if (runtime.spawnedLink != null || runtime.source == null || runtime.target == null) return;
 
             Transform parent = spawnParent != null ? spawnParent : transform;       // 親オブジェクトが指定されていない場合は管理オブジェクト配下に生成する
-            runtime.spawnedLink = Instantiate(linkPrefab, runtime.source.position, Quaternion.identity, parent);
+            runtime.spawnedLink = Instantiate(playerConfig.Link.linkPrefab, runtime.source.position, Quaternion.identity, parent);
             runtime.spawnedLink.SetTarget(runtime.target);
         }
 

@@ -5161,8 +5161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 930a9699b8f2ca94fb6349509e9280f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkPrefab: {fileID: 2980094787936113168, guid: 94b7995099527794b9e467f40c969a26, type: 3}
-  targetDistance: 8
+  playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
   spawnParent: {fileID: 0}
 --- !u!4 &123128494
 Transform:

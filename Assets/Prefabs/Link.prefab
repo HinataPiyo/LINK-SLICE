@@ -5029,13 +5029,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  maxLineWidth: 0.15
-  growDuration: 0.2
-  shrinkDuration: 0.3
-  maxAnimationDeltaTime: 0.016666668
+  playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
 --- !u!114 &2585206316543653826
 MonoBehaviour:
   m_ObjectHideFlags: 0

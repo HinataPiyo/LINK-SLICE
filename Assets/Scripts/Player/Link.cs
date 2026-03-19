@@ -1,5 +1,7 @@
 namespace PlayerSystem.Link
 {
+    using System.Collections;
+
     using Common;
     using Unity.Netcode;
     using UnityEngine;
@@ -9,11 +11,7 @@ namespace PlayerSystem.Link
     /// </summary>
     public class Link : NetworkBehaviour
     {
-        [SerializeField] LayerMask targetLayer;
-        [SerializeField] float maxLineWidth = 0.15f;
-        [SerializeField] float growDuration = 0.2f;
-        [SerializeField] float shrinkDuration = 0.12f;
-        [SerializeField] float maxAnimationDeltaTime = 1f / 60f;
+        [SerializeField] PlayerConfig playerConfig;
 
         LineRenderer lineRenderer;
         Transform target;
@@ -27,6 +25,9 @@ namespace PlayerSystem.Link
         const float WidthEpsilon = 0.0001f;
 
         public bool IsBreakFinished => isBreaking && notifiedBroken;
+        Coroutine attackCooldownRoutine;
+
+        bool CanProcessAttack => NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer;
 
         /// <summary>
         /// 外部から接続先ターゲットを設定する
@@ -99,7 +100,10 @@ namespace PlayerSystem.Link
                 float length = Vector2.Distance(selfPos, targetPos);
                 linkEffect.UpdateVisual(center, angle, length);
 
-                GetHitCollider(angle, length);      // 毎フレーム攻撃判定を更新する（攻撃の当たり判定は線の中心から線の長さ分の距離にある円形の範囲とする）
+                if (CanProcessAttack)
+                {
+                    GetHitCollider(angle, length);      // 毎フレーム攻撃判定を更新する（攻撃の当たり判定は線の中心から線の長さ分の距離にある円形の範囲とする）
+                }
             }
             else
             {
@@ -114,12 +118,12 @@ namespace PlayerSystem.Link
             }
 
             // enabledの瞬間切り替えではなく、幅を補間して自然に表示/非表示する
-            float safeDeltaTime = Mathf.Min(Time.deltaTime, maxAnimationDeltaTime);     // フレーム落ちなどで極端に大きなdeltaTimeが入るのを防止
-            float duration = isLinkActive ? Mathf.Max(0.0001f, growDuration) : Mathf.Max(0.0001f, shrinkDuration);  // 0除算防止
+            float safeDeltaTime = Mathf.Min(Time.deltaTime, playerConfig.Link.maxAnimationDeltaTime);     // フレーム落ちなどで極端に大きなdeltaTimeが入るのを防止
+            float duration = isLinkActive ? Mathf.Max(0.0001f, playerConfig.Link.growDuration) : Mathf.Max(0.0001f, playerConfig.Link.shrinkDuration);  // 0除算防止
             float step = safeDeltaTime / duration;          // 1秒間にstepが1以上になるように補正する（フレーム落ちしても数秒で完全に表示/非表示になるように）
             float targetLerp = isLinkActive ? 1f : 0f;      // 目標の幅に向かってwidthLerp01を補間する
             widthLerp01 = Mathf.MoveTowards(widthLerp01, targetLerp, step);     // 補間値から現在の線の幅を計算する
-            currentLineWidth = maxLineWidth * widthLerp01;      // 線の幅を更新し、幅が十分に大きいときだけ線を表示する
+            currentLineWidth = playerConfig.Link.maxLineWidth * widthLerp01;      // 線の幅を更新し、幅が十分に大きいときだけ線を表示する
 
             // 線の幅を更新し、幅が十分に大きいときだけ線を表示する
             lineRenderer.startWidth = currentLineWidth;
@@ -152,7 +156,7 @@ namespace PlayerSystem.Link
         {
             Vector2 origin = transform.position;
             Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-            RaycastHit2D hit = Physics2D.Raycast(origin, dir, distance, targetLayer);
+            RaycastHit2D hit = Physics2D.Raycast(origin, dir, distance, playerConfig.Link.targetLayer);
             Debug.DrawRay(origin, dir * distance, Color.red, 0.1f);
 
             if (hit.collider != null && hit.collider.TryGetComponent(out IDamageable damageableTarget))
@@ -167,7 +171,34 @@ namespace PlayerSystem.Link
         /// </summary>
         void OnAttack(IDamageable damageableTarget)
         {
-            damageableTarget.ApplyDamage(1);
+            if (!CanProcessAttack) return;
+            if(attackCooldownRoutine != null) return;     // 攻撃のクールダウン中は攻撃できない
+            attackCooldownRoutine = StartCoroutine(AttackCooldownRoutine(damageableTarget));     // 攻撃のクールダウンを開始する
+        }
+
+        /// <summary>
+        /// 攻撃のクールダウン処理。攻撃対象にダメージを与えた後、一定時間攻撃できない状態にする
+        /// </summary>
+        IEnumerator AttackCooldownRoutine(IDamageable damageableTarget)
+        {
+            if (damageableTarget == null)
+            {
+                attackCooldownRoutine = null;
+                yield break;
+            }
+
+            damageableTarget.ApplyDamage(playerConfig.Link.strength);     // ダメージを与える
+            yield return new WaitForSeconds(playerConfig.Link.attackIntarval);
+            attackCooldownRoutine = null;
+        }
+
+        void OnDisable()
+        {
+            // 攻撃のクールダウン中にオブジェクトが無効化された場合は、クールダウンをキャンセルする
+            if (attackCooldownRoutine == null) return;
+
+            StopCoroutine(attackCooldownRoutine);
+            attackCooldownRoutine = null;
         }
     }
 }
