@@ -2,13 +2,15 @@ namespace Upgrade
 {
     using System;
     using System.Collections.Generic;
+    using UI.Module;
     using UnityEngine;
     using UnityEngine.UI;
 
     public class UpgradeManager : MonoBehaviour
     {
         public static UpgradeManager I { get; private set; }
-
+        const int UPGRADE_OPTION_COUNT = 3;    // アップグレードの選択肢の数
+        [SerializeField] UpgradeModuleController uiCtrl;
         [SerializeField] UpgradeDatabase upgradeDatabase;
         readonly Dictionary<Type, Entry> activeEffects = new Dictionary<Type, Entry>();
 
@@ -19,7 +21,9 @@ namespace Upgrade
         public class Entry
         {
             public EffectBase effect;
+            public UpgradeDefinition data;
             public int activeCount;
+            public Action onClickAction;
         }
 
         public void Awake()
@@ -31,7 +35,43 @@ namespace Upgrade
         }
 
         /// <summary>
+        /// アップグレードUIを表示する処理をここに実装する
+        /// activeEffectsの内容に基づいてUIを更新する
+        /// </summary>
+        public void OnShowUpgradeUI()
+        {
+            // まず表示するUpgrade内容を決める
+            // UpgradeDatabaseからランダムで選出する
+            UpgradeDefinition[] upgradeDefinitions = upgradeDatabase.GetRandomUpgradeDefinitions(UPGRADE_OPTION_COUNT);    // 3つのUpgradeをランダムに選出する
+            List<Entry> entries = new List<Entry>();
+            for (int i = 0; i < upgradeDefinitions.Length; i++)
+            {
+                Entry entry = new Entry();
+                entry.data = upgradeDefinitions[i];
+                entry.onClickAction = () => ApplyUpgrade(entry.data);   // クリックされたときにそのUpgradeを適用するアクションを設定する
+                entries.Add(entry);
+            }
+
+            uiCtrl.m_SelectUpgradeElement.Show(entries.ToArray());   // UIを表示して、選出されたUpgradeの内容を渡す
+        }
+
+        /// <summary>
         /// アップグレードを適用する処理をここに実装する
+        /// dataの内容に基づいてアップグレードを適用する
+        /// 例えば、CoreHealthUpのUpgradeDefinitionであれば、コアの体力を上げる処理を行う
+        /// さらに、同じ型の効果がすでにアクティブな場合は、その効果のactiveCountを増やすなどの処理も行う
+        /// そして、アップグレードが適用された後は、UIを更新して現在の効果の内容を反映させる
+        /// </summary>
+        void ApplyUpgrade(UpgradeDefinition data)
+        {
+            if (data == null) return;
+
+            // dataの内容に基づいてアップグレードを適用する処理をここに実装する
+            if (data is Data.CoreHealthUp) ApplyCoreHealthUpgrade();
+        }
+
+        /// <summary>
+        /// コアの体力を増加させるアップグレードを適用する処理をここに実装する
         /// </summary>
         void ApplyCoreHealthUpgrade()
         {
@@ -56,12 +96,15 @@ namespace Upgrade
             if (effect == null) return;
 
             Type effectType = effect.GetType();
+
+            // すでに同じ型の効果がアクティブな場合は、activeCountを増やして終了する
             if (activeEffects.TryGetValue(effectType, out Entry entry))
             {
                 entry.activeCount++;
                 return;
             }
 
+            // そうでない場合は、新たにエントリーを作成して追加する
             activeEffects.Add(effectType, new Entry { effect = effect, activeCount = 1 });
         }
 

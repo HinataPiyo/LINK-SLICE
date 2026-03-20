@@ -4,6 +4,7 @@ namespace Enemy
     using System.Collections.Generic;
     using Unity.Netcode;
     using UnityEngine;
+    using Upgrade;
 
     public class EnemySpawnController : MonoBehaviour
     {
@@ -61,6 +62,8 @@ namespace Enemy
 
                     yield return new WaitForSeconds(timeAfterWave);         // 次のウェーブまでの時間を待機
                 }
+
+                UpgradeManager.I.OnShowUpgradeUI();     // ウェーブとウェーブの間にアップグレードUIを表示する
             }
         }
 
