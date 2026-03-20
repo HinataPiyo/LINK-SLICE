@@ -2,15 +2,26 @@ namespace PlayerSystem
 {
     using System.Collections;
     using System.Collections.Generic;
+    using PlayerSystem.Link;
     using Unity.Netcode;
     using UnityEngine;
     
     public class Attack : MonoBehaviour
     {
         [SerializeField] PlayerConfig playerConfig;
+        LinkRuntimeStats runtimeStats;
         public readonly Dictionary<int, Coroutine> attackCooldownRoutines = new Dictionary<int, Coroutine>();
         public readonly HashSet<int> processedTargetIds = new HashSet<int>();
         public bool CanProcessAttack => NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer;
+
+        /// <summary>
+        /// LinkController から共有ランタイムステータスを注入する。
+        /// 攻撃のたびに管理側へ問い合わせるのではなく、各 Link が同じ状態を直接読む構造にする。
+        /// </summary>
+        public void Initialize(LinkRuntimeStats linkRuntimeStats)
+        {
+            runtimeStats = linkRuntimeStats;
+        }
         /// <summary>
         /// 攻撃処理。Healthコンポーネントを持つオブジェクトに対してダメージを与える
         /// </summary>
@@ -35,7 +46,10 @@ namespace PlayerSystem
                 yield break;
             }
 
-            damageableTarget.ApplyDamage(playerConfig.Link.strength);     // ダメージを与える
+            // RuntimeStats が存在する場合は、アップグレード反映後の最終攻撃力を優先して使用する。
+            // フォールバックを残すことで、注入漏れ時にも最低限従来挙動を維持する。
+            int damage = runtimeStats != null ? runtimeStats.CurrentStrength : playerConfig.Link.strength;
+            damageableTarget.ApplyDamage(damage);
             yield return new WaitForSeconds(playerConfig.Link.attackIntarval);
             attackCooldownRoutines.Remove(targetId);
         }

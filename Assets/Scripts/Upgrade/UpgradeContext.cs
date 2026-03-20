@@ -1,3 +1,5 @@
+using PlayerSystem.Link;
+
 namespace Upgrade
 {
     /// <summary>
@@ -7,10 +9,12 @@ namespace Upgrade
     public sealed class UpgradeContext
     {
         public Core.Health CoreHealth { get; }
+        public LinkRuntimeStats LinkRuntimeStats { get; }
 
-        public UpgradeContext(Core.Health coreHealth)
+        public UpgradeContext(Core.Health coreHealth, LinkRuntimeStats linkRuntimeStats)
         {
             CoreHealth = coreHealth;
+            LinkRuntimeStats = linkRuntimeStats;
         }
     }
 }

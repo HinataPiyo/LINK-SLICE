@@ -5,6 +5,7 @@ namespace PlayerSystem.Link
     using UnityEngine;
     
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(LinkRuntimeStats))]
     public class LinkController : MonoBehaviour
     {
         static LinkController instance;
@@ -19,6 +20,7 @@ namespace PlayerSystem.Link
 
         float targetDistanceSqr;
         float targetDistance;
+        LinkRuntimeStats runtimeStats;
 
         sealed class LinkRuntime
         {
@@ -39,9 +41,23 @@ namespace PlayerSystem.Link
             }
 
             instance = this;
+            runtimeStats = GetComponent<LinkRuntimeStats>();
+            if (runtimeStats == null)
+            {
+                // 既存シーンにコンポーネントがまだ付いていない場合でも動作できるように、実行時に補完する。
+                runtimeStats = gameObject.AddComponent<LinkRuntimeStats>();
+            }
+
+            runtimeStats.Initialize(playerConfig);
             targetDistance = playerConfig.Link.distance;
             targetDistanceSqr = targetDistance * targetDistance;        // 0除算防止
         }
+
+        /// <summary>
+        /// アップグレード適用側が Link の共有攻撃力を更新するための入口。
+        /// LinkController は毎回の攻撃仲介はせず、共有ステータスの保持元としてだけ関与する。
+        /// </summary>
+        public LinkRuntimeStats RuntimeStats => runtimeStats;
 
         void Update()
         {
@@ -250,6 +266,7 @@ namespace PlayerSystem.Link
 
             Transform parent = spawnParent != null ? spawnParent : transform;       // 親オブジェクトが指定されていない場合は管理オブジェクト配下に生成する
             runtime.spawnedLink = Instantiate(playerConfig.Link.linkPrefab, runtime.source.position, Quaternion.identity, parent);
+            runtime.spawnedLink.Initialize(runtimeStats);
             runtime.spawnedLink.SetTarget(runtime.target);
         }
 

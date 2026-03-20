@@ -29,6 +29,21 @@ namespace PlayerSystem.Link
         public bool IsBreakFinished => isBreaking && notifiedBroken;
 
         /// <summary>
+        /// LinkController から共有ランタイムステータスを受け取る。
+        /// Link 自体は生成管理を知らず、攻撃処理に必要な共有状態だけを Attack へ渡す。
+        /// </summary>
+        public void Initialize(LinkRuntimeStats runtimeStats)
+        {
+            if (attack == null)
+            {
+                Debug.LogWarning("Link に Attack 参照が設定されていないため、ランタイム攻撃ステータスを渡せません。", this);
+                return;
+            }
+
+            attack.Initialize(runtimeStats);
+        }
+
+        /// <summary>
         /// 外部から接続先ターゲットを設定する
         /// </summary>
         public void SetTarget(Transform newTarget)

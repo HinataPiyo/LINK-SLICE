@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ebfcf96e9f731f43b40d0310b9a8ada, type: 3}
-  m_Name: UpgradeDatabase
+  m_Script: {fileID: 11500000, guid: 80653cfb49b1a5c45a93fee759d1bb4d, type: 3}
+  m_Name: LinkStrengthUp
   m_EditorClassIdentifier: 
-  upgrades:
-  - {fileID: 11400000, guid: d4bd4f0bc1ab02b4eb250d488841690d, type: 2}
-  - {fileID: 11400000, guid: e42a247f2cdde7a479df169d340d90cc, type: 2}
+  upgradeName: "\u30EA\u30F3\u30AF\u653B\u6483\u529B\u5F37\u5316"
+  icon: {fileID: 0}
+  maxLevel: 10
+  strengthIncreasePercent: 1

@@ -2,6 +2,7 @@ namespace Upgrade
 {
     using System;
     using System.Collections.Generic;
+    using PlayerSystem.Link;
     using UI.Module;
     using UnityEngine;
     using UnityEngine.UI;
@@ -17,8 +18,10 @@ namespace Upgrade
 
         public bool IsUpgraded { get; private set; } = false;    // アップグレードが適用されたかどうかを示すフラグ
 
-        [Header("テスト")]
+        // 今後、アップグレードの適用にプレイヤーや武器、移動などの参照が必要になった場合は、
+        // このクラスにそれらの参照も持たせる。
         Core.Health coreHealth;
+        LinkRuntimeStats linkRuntimeStats;
 
         public class Entry
         {
@@ -32,8 +35,9 @@ namespace Upgrade
 
         public void Awake()
         {
-            if(I == null) I = this;
+            if (I == null) I = this;
             coreHealth = FindAnyObjectByType<Core.Health>();
+            linkRuntimeStats = FindAnyObjectByType<LinkRuntimeStats>();
         }
 
         /// <summary>
@@ -233,10 +237,12 @@ namespace Upgrade
         UpgradeContext BuildContext()
         {
             if (coreHealth == null)
-                coreHealth = FindAnyObjectByType<Core.Health>();            
+                coreHealth = FindAnyObjectByType<Core.Health>();
+            if (linkRuntimeStats == null)
+                linkRuntimeStats = FindAnyObjectByType<LinkRuntimeStats>();
 
             // 今後プレイヤー、武器、移動などの参照を追加する場合も、この生成箇所だけを拡張すればよい。
-            return new UpgradeContext(coreHealth);
+            return new UpgradeContext(coreHealth, linkRuntimeStats);
         }
 
         /// <summary>
