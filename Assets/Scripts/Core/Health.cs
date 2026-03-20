@@ -5,11 +5,9 @@ namespace Core
 
     public class Health : HealthBase
     {
-        CoreController coreCtrl;
 
         protected override void Initialize()
         {
-            coreCtrl = GetComponent<CoreController>();
         }
 
         /// <summary>
@@ -48,7 +46,6 @@ namespace Core
         {
             if (!IsServer) return;
             int max = Mathf.RoundToInt(defaultMaxHealth * (1f + percent));     // 最大体力を増加させる
-            currentHealth.Value = max;     // 現在の体力も最大体力に合わせて回復させる
             MaxHealth = max;     // 最大体力を更新する
 
             Debug.Log($"Health upgraded! New MaxHealth: {max}, CurrentHealth: {CurrentHealth}");

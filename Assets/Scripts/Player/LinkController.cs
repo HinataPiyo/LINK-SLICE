@@ -174,6 +174,9 @@ namespace PlayerSystem.Link
             UpdateLinkTransform(runtime);
         }
 
+        /// <summary>
+        /// リンクの見た目の更新と攻撃判定の更新を行う
+        /// </summary>
         void UpdateLinkTransform(LinkRuntime runtime)
         {
             if (runtime.spawnedLink == null || runtime.source == null || runtime.target == null) return;
@@ -182,6 +185,9 @@ namespace PlayerSystem.Link
             runtime.spawnedLink.SetTarget(runtime.target);
         }
 
+        /// <summary>
+        /// リンク切断中のLinkの見た目の更新を行う
+        /// </summary>
         void UpdateBreakingLinkTransform(LinkRuntime runtime)
         {
             if (runtime.spawnedLink == null || runtime.source == null) return;

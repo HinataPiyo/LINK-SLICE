@@ -36,6 +36,10 @@ namespace UI.Module
             Initialize(m_SelectUpgradeElement, MODULE_SELECT_UPGRADE_ELEMENT, root);
         }
 
+        /// <summary>
+        /// サーバーからクライアントにUpgrade選択UIを表示するためのClientRpcを呼び出す。サーバーであれば、直接UIを表示する。
+        /// </summary>
+        /// <param name="entries"> サーバー側で表示するUpgradeの内容を含むEntryの配列。クライアントはこの情報を使用して、UIに表示するUpgradeの内容を決定する。</param>
         public void ShowUpgradeSelection(UpgradeManager.Entry[] entries)
         {
             if (!IsServer || entries == null) return;
@@ -53,7 +57,9 @@ namespace UI.Module
             ShowUpgradeSelectionClientRpc(definitionIndices, activeCounts);
         }
 
-        // クライアントにUpgrade選択UIを非表示にするためのClientRpcを呼び出す
+        /// <summary>
+        /// クライアントにUpgrade選択UIを非表示にするためのClientRpcを呼び出す
+        /// </summary>
         public void HideUpgradeSelection()
         {
             if (!IsServer) return;

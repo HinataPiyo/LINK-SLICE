@@ -13,6 +13,7 @@ namespace PlayerSystem.Link
     public class Link : NetworkBehaviour
     {
         [SerializeField] PlayerConfig playerConfig;
+        [SerializeField] Attack attack;
 
         LineRenderer lineRenderer;
         Transform target;
@@ -26,10 +27,6 @@ namespace PlayerSystem.Link
         const float WidthEpsilon = 0.0001f;
 
         public bool IsBreakFinished => isBreaking && notifiedBroken;
-        readonly Dictionary<int, Coroutine> attackCooldownRoutines = new Dictionary<int, Coroutine>();
-        readonly HashSet<int> processedTargetIds = new HashSet<int>();
-
-        bool CanProcessAttack => NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer;
 
         /// <summary>
         /// 外部から接続先ターゲットを設定する
@@ -112,7 +109,7 @@ namespace PlayerSystem.Link
                 float length = Vector2.Distance(selfPos, targetPos);
                 linkEffect.UpdateVisual(center, angle, length);
 
-                if (CanProcessAttack)
+                if (attack.CanProcessAttack)
                 {
                     GetHitCollider(center, angle, length);      // 毎フレーム、リンクの見た目の太さに合わせた帯状の当たり判定を更新する
                 }
@@ -168,7 +165,7 @@ namespace PlayerSystem.Link
             Debug.DrawLine(center + right + up, center - right + up, Color.red, 0.1f);
             Debug.DrawLine(center - right + up, center - right - up, Color.red, 0.1f);
 
-            processedTargetIds.Clear();
+            attack.processedTargetIds.Clear();
 
             for (int i = 0; i < hits.Length; i++)
             {
@@ -176,11 +173,11 @@ namespace PlayerSystem.Link
                 if (hit.collider == null) continue;
                 if (!hit.collider.TryGetComponent(out IDamageable damageableTarget)) continue;
 
-                int targetId = GetDamageableTargetId(damageableTarget);
+                int targetId = attack.GetDamageableTargetId(damageableTarget);
                 if (targetId == 0) continue;
-                if (!processedTargetIds.Add(targetId)) continue;
+                if (!attack.processedTargetIds.Add(targetId)) continue;
 
-                OnAttack(damageableTarget, targetId);
+                attack.OnAttack(damageableTarget, targetId);
             }
         }
 
@@ -247,54 +244,6 @@ namespace PlayerSystem.Link
         }
         
 #endregion
-        /// <summary>
-        /// 攻撃処理。Healthコンポーネントを持つオブジェクトに対してダメージを与える
-        /// </summary>
-        void OnAttack(IDamageable damageableTarget, int targetId)
-        {
-            if (!CanProcessAttack) return;
-            if (damageableTarget == null) return;
-            if (attackCooldownRoutines.ContainsKey(targetId)) return;     // この対象のクールダウン中は攻撃できない
-
-            Coroutine cooldownRoutine = StartCoroutine(AttackCooldownRoutine(targetId, damageableTarget));
-            attackCooldownRoutines[targetId] = cooldownRoutine;
-        }
-
-        /// <summary>
-        /// 攻撃のクールダウン処理。攻撃対象ごとに独立して一定時間攻撃できない状態にする
-        /// </summary>
-        IEnumerator AttackCooldownRoutine(int targetId, IDamageable damageableTarget)
-        {
-            if (damageableTarget == null)
-            {
-                attackCooldownRoutines.Remove(targetId);
-                yield break;
-            }
-
-            damageableTarget.ApplyDamage(playerConfig.Link.strength);     // ダメージを与える
-            yield return new WaitForSeconds(playerConfig.Link.attackIntarval);
-            attackCooldownRoutines.Remove(targetId);
-        }
-
-        int GetDamageableTargetId(IDamageable damageableTarget)
-        {
-            Object damageableObject = damageableTarget as Object;
-            if (damageableObject == null) return 0;
-
-            return damageableObject.GetInstanceID();
-        }
-
-        void OnDisable()
-        {
-            // 攻撃のクールダウン中にオブジェクトが無効化された場合は、対象ごとのクールダウンをすべてキャンセルする
-            foreach (Coroutine cooldownRoutine in attackCooldownRoutines.Values)
-            {
-                if (cooldownRoutine == null) continue;
-                StopCoroutine(cooldownRoutine);
-            }
-
-            attackCooldownRoutines.Clear();
-            processedTargetIds.Clear();
-        }
+        
     }
 }

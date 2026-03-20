@@ -68,8 +68,7 @@ namespace Core
         /// </summary>
         public void CoreVisualUpdate()
         {
-            if (energyCircleTransform == null) return;
-            if (health == null) return;
+            if (energyCircleTransform == null || health == null) return;
             if (health.MaxHealth <= 0) return;   // 最大体力が0以下の場合はエネルギーの割合を計算できないため、処理を行わない
 
             float energyRatio = Mathf.Clamp01((float)health.CurrentHealth / health.MaxHealth);   // 現在の体力と最大体力からエネルギーの割合を計算する
