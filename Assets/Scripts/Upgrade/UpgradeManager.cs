@@ -2,8 +2,10 @@ namespace Upgrade
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections;
     using PlayerSystem.Link;
     using UI.Module;
+    using Unity.Netcode;
     using UnityEngine;
     using UnityEngine.UI;
 
@@ -13,8 +15,13 @@ namespace Upgrade
         const int UPGRADE_OPTION_COUNT = 3;    // アップグレードの選択肢の数
         [SerializeField] UpgradeModuleController uiCtrl;
         [SerializeField] UpgradeDatabase upgradeDatabase;
+        [SerializeField] float selectedResultDisplaySeconds = 2.5f;
         readonly Dictionary<UpgradeDefinition, UpgradeState> upgradeStates = new Dictionary<UpgradeDefinition, UpgradeState>();
+        readonly Dictionary<ulong, int> selectedUpgradeByClientId = new Dictionary<ulong, int>();
         Entry[] currentEntries;
+        int[] selectedPlayerCounts;
+        int expectedSelectionCount;
+        Coroutine resolveSelectionCoroutine;
 
         public bool IsUpgraded { get; private set; } = false;    // アップグレードが適用されたかどうかを示すフラグ
 
@@ -56,6 +63,7 @@ namespace Upgrade
             }
 
             IsUpgraded = true;    // 候補生成に成功したタイミングで待機フラグを立てる
+            expectedSelectionCount = GetExpectedSelectionCount();
             List<Entry> entries = new List<Entry>();
             for (int i = 0; i < upgradeDefinitions.Length; i++)
             {
@@ -69,14 +77,19 @@ namespace Upgrade
             }
 
             currentEntries = entries.ToArray();
-            uiCtrl.ShowUpgradeSelection(currentEntries);   // UIを表示して、選出されたUpgradeの内容を渡す
+            selectedUpgradeByClientId.Clear();
+            selectedPlayerCounts = new int[currentEntries.Length];
+
+            uiCtrl.ShowUpgradeSelection(currentEntries, expectedSelectionCount);   // UIを表示して、選出されたUpgradeの内容を渡す
+            uiCtrl.UpdateUpgradeSelectionCounts(selectedPlayerCounts, expectedSelectionCount);
         }
 
         /// <summary>
-        /// UIから選択されたインデックスに基づいて、対応するアップグレードを適用する。
+        /// プレイヤーごとのアップグレード投票を受け付ける。
         /// </summary>
         /// <param name="selectedIndex">UIから渡される選択されたアップグレードのインデックス</param>
-        public void ApplyUpgradeAt(int selectedIndex)
+        /// <param name="clientId">選択したクライアントID</param>
+        public void SubmitUpgradeSelection(int selectedIndex, ulong clientId)
         {
             if (!IsUpgraded || currentEntries == null) return;
 
@@ -86,7 +99,16 @@ namespace Upgrade
                 return;
             }
 
-            ApplyUpgrade(currentEntries[selectedIndex].data);   // 選択されたアップグレードを適用する
+            if (selectedUpgradeByClientId.ContainsKey(clientId)) return;
+
+            selectedUpgradeByClientId.Add(clientId, selectedIndex);
+            selectedPlayerCounts[selectedIndex]++;
+            uiCtrl.UpdateUpgradeSelectionCounts(selectedPlayerCounts, expectedSelectionCount);
+
+            if (selectedUpgradeByClientId.Count < expectedSelectionCount) return;
+            if (resolveSelectionCoroutine != null) return;
+
+            resolveSelectionCoroutine = StartCoroutine(ResolveUpgradeSelectionRoutine());
         }
 
         /// <summary>
@@ -110,6 +132,10 @@ namespace Upgrade
 
             ChangeUpgradeFlag(false);   // アップグレードが適用された後、UpgradeManagerのフラグをfalseにする
             currentEntries = null;
+            selectedPlayerCounts = null;
+            expectedSelectionCount = 0;
+            selectedUpgradeByClientId.Clear();
+            resolveSelectionCoroutine = null;
 
             if (uiCtrl == null) return;
 
@@ -123,6 +149,36 @@ namespace Upgrade
             {
                 uiCtrl.m_SelectUpgradeElement.Hide();
             }
+        }
+
+        /// <summary>
+        /// アップグレード選択の結果を集計して、実際に適用するアップグレードを決定するルーチン。
+        /// </summary>
+        IEnumerator ResolveUpgradeSelectionRoutine()
+        {
+            List<int> selectedIndices = new List<int>();
+            foreach (int selectedIndex in selectedUpgradeByClientId.Values)
+            {
+                if (!selectedIndices.Contains(selectedIndex))
+                {
+                    selectedIndices.Add(selectedIndex);
+                }
+            }
+
+            if (selectedIndices.Count == 0)
+            {
+                Debug.LogWarning("アップグレード投票結果が空のため、解決処理を中断しました。");
+                ChangeUpgradeFlag(false);
+                yield break;
+            }
+
+            int randomIndex = UnityEngine.Random.Range(0, selectedIndices.Count);
+            int selectedUpgradeIndex = selectedIndices[randomIndex];
+            uiCtrl.ShowUpgradeSelectionResult(selectedUpgradeIndex);
+
+            yield return new WaitForSeconds(selectedResultDisplaySeconds);
+
+            ApplyUpgrade(currentEntries[selectedUpgradeIndex].data);
         }
 
         /// <summary>
@@ -243,6 +299,17 @@ namespace Upgrade
 
             // 今後プレイヤー、武器、移動などの参照を追加する場合も、この生成箇所だけを拡張すればよい。
             return new UpgradeContext(coreHealth, linkRuntimeStats);
+        }
+
+        int GetExpectedSelectionCount()
+        {
+            NetworkManager networkManager = NetworkManager.Singleton;
+            if (networkManager != null && networkManager.IsListening && networkManager.ConnectedClientsIds != null)
+            {
+                return Mathf.Max(1, networkManager.ConnectedClientsIds.Count);
+            }
+
+            return 1;
         }
 
         /// <summary>

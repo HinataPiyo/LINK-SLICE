@@ -8,7 +8,7 @@ namespace PlayerSystem.Link
     [RequireComponent(typeof(LinkRuntimeStats))]
     public class LinkController : MonoBehaviour
     {
-        static LinkController instance;
+        public static LinkController I { get; private set; }
 
         [Header("生成設定")]
         [SerializeField] PlayerConfig playerConfig;
@@ -33,31 +33,19 @@ namespace PlayerSystem.Link
 
         void Awake()
         {
-            if (instance != null && instance != this)
+            if(I == null) I = this;
+            else
             {
-                Debug.LogWarning("LinkController はシーンに1つだけ配置してください", this);
                 Destroy(gameObject);
                 return;
             }
 
-            instance = this;
             runtimeStats = GetComponent<LinkRuntimeStats>();
-            if (runtimeStats == null)
-            {
-                // 既存シーンにコンポーネントがまだ付いていない場合でも動作できるように、実行時に補完する。
-                runtimeStats = gameObject.AddComponent<LinkRuntimeStats>();
-            }
 
             runtimeStats.Initialize(playerConfig);
             targetDistance = playerConfig.Link.distance;
             targetDistanceSqr = targetDistance * targetDistance;        // 0除算防止
         }
-
-        /// <summary>
-        /// アップグレード適用側が Link の共有攻撃力を更新するための入口。
-        /// LinkController は毎回の攻撃仲介はせず、共有ステータスの保持元としてだけ関与する。
-        /// </summary>
-        public LinkRuntimeStats RuntimeStats => runtimeStats;
 
         void Update()
         {
@@ -227,11 +215,6 @@ namespace PlayerSystem.Link
         /// </summary>
         void OnDestroy()
         {
-            if (instance == this)
-            {
-                instance = null;
-            }
-
             // 破棄演出のコルーチンが走っている場合は停止する
             foreach (LinkRuntime runtime in linkRuntimes.Values)
             {
