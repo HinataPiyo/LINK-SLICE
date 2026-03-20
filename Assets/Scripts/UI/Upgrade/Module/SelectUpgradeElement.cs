@@ -235,11 +235,7 @@ namespace UI.Module
                 element.pickingMode = isInteractable ? PickingMode.Position : PickingMode.Ignore;
                 button.pickingMode = isInteractable ? PickingMode.Position : PickingMode.Ignore;
 
-                if (isInteractable)
-                {
-                    button.RemoveFromClassList("locked");
-                    return;
-                }
+                if (isInteractable) return;
 
                 button.Blur();
             }
@@ -251,7 +247,6 @@ namespace UI.Module
                 button.SetEnabled(false);
                 element.pickingMode = PickingMode.Ignore;
                 button.pickingMode = PickingMode.Ignore;
-                button.AddToClassList("locked");
                 button.Blur();
             }
 
@@ -262,7 +257,6 @@ namespace UI.Module
                 button.SetEnabled(true);
                 element.pickingMode = PickingMode.Ignore;
                 button.pickingMode = PickingMode.Ignore;
-                button.AddToClassList("locked");
                 button.Blur();
             }
 
