@@ -14,6 +14,8 @@ namespace Upgrade
         [SerializeField] UpgradeDatabase upgradeDatabase;
         readonly Dictionary<Type, Entry> activeEffects = new Dictionary<Type, Entry>();
 
+        public bool IsUpgraded { get; private set; } = false;    // アップグレードが適用されたかどうかを示すフラグ
+
         [Header("テスト")]
         [SerializeField] Button button;
         Core.Health coreHealth;
@@ -25,6 +27,8 @@ namespace Upgrade
             public int activeCount;
             public Action onClickAction;
         }
+
+        public void ChangeUpgradeFlag(bool value) => IsUpgraded = value;
 
         public void Awake()
         {
@@ -40,6 +44,7 @@ namespace Upgrade
         /// </summary>
         public void OnShowUpgradeUI()
         {
+            IsUpgraded = true;    // アップグレードUIが表示された時点でアップグレードが適用されたとみなす
             // まず表示するUpgrade内容を決める
             // UpgradeDatabaseからランダムで選出する
             UpgradeDefinition[] upgradeDefinitions = upgradeDatabase.GetRandomUpgradeDefinitions(UPGRADE_OPTION_COUNT);    // 3つのUpgradeをランダムに選出する
@@ -68,6 +73,9 @@ namespace Upgrade
 
             // dataの内容に基づいてアップグレードを適用する処理をここに実装する
             if (data is Data.CoreHealthUp) ApplyCoreHealthUpgrade();
+
+            ChangeUpgradeFlag(false);   // アップグレードが適用された後、UpgradeManagerのフラグをfalseにする
+            uiCtrl.m_SelectUpgradeElement.Hide();    // アップグレードが適用された後、UIを非表示にする
         }
 
         /// <summary>

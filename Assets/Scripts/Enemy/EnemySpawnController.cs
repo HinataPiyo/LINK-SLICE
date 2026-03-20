@@ -64,6 +64,7 @@ namespace Enemy
                 }
 
                 UpgradeManager.I.OnShowUpgradeUI();     // ウェーブとウェーブの間にアップグレードUIを表示する
+                yield return new WaitWhile(() => UpgradeManager.I.IsUpgraded);     // プレイヤーがアップグレードを選択するまで待機
             }
         }
 

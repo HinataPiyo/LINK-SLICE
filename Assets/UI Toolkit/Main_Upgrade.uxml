@@ -5,7 +5,7 @@
             <ui:VisualElement name="title-box" style="flex-grow: 1;">
                 <ui:Label text="強化する項目を選択してください" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/NotoSansJP-Medium.ttf?fileID=12800000&amp;guid=b5fecf1a33b7c4446a2b68c8b90542df&amp;type=3#NotoSansJP-Medium&quot;); font-size: 38px; -unity-text-align: middle-center; -unity-font-style: normal; color: rgb(255, 223, 73);" />
             </ui:VisualElement>
-            <ui:VisualElement name="elements" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement name="elements" style="flex-grow: 1; flex-direction: row; justify-content: space-around;">
                 <ui:Instance template="Temp_UpgradeElement" />
                 <ui:Instance template="Temp_UpgradeElement" />
                 <ui:Instance template="Temp_UpgradeElement" />
