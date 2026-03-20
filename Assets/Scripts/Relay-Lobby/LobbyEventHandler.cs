@@ -38,9 +38,20 @@ public class LobbyEventHandler : MonoBehaviour
     /// </summary>
     private void BindButtons()
     {
-        createLobbyButton.onClick.AddListener(HandleCreateLobbyClicked);
-        refreshButton.onClick.AddListener(HandleRefreshClicked);
-        startGameButton.onClick.AddListener(HandleStartGameClicked);
+        if (createLobbyButton != null)
+        {
+            createLobbyButton.onClick.AddListener(HandleCreateLobbyClicked);
+        }
+
+        if (refreshButton != null)
+        {
+            refreshButton.onClick.AddListener(HandleRefreshClicked);
+        }
+
+        if (startGameButton != null)
+        {
+            startGameButton.onClick.AddListener(HandleStartGameClicked);
+        }
     }
 
     /// <summary>
@@ -77,7 +88,10 @@ public class LobbyEventHandler : MonoBehaviour
     /// </summary>
     public void Refresh(List<Lobby> lobbyList)
     {
-        if(lobbyListContent == null) return;
+        if (lobbyListContent == null || lobbyBannerPrefab == null)
+        {
+            return;
+        }
         
         foreach (Transform child in lobbyListContent)
         {
@@ -96,8 +110,18 @@ public class LobbyEventHandler : MonoBehaviour
     /// </summary>
     public void SetControlsInteractable(bool canCreateLobby, bool canRefreshLobby, bool canStartGame)
     {
-        createLobbyButton.interactable = canCreateLobby;
-        refreshButton.interactable = canRefreshLobby;
-        startGameButton.interactable = canStartGame;
+        SetButtonInteractable(createLobbyButton, canCreateLobby);
+        SetButtonInteractable(refreshButton, canRefreshLobby);
+        SetButtonInteractable(startGameButton, canStartGame);
+    }
+
+    private static void SetButtonInteractable(Button button, bool interactable)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.interactable = interactable;
     }
 }
