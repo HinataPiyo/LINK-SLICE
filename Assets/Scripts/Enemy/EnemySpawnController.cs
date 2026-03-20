@@ -41,18 +41,26 @@ namespace Enemy
                     foreach (EnemyWaveEntry.Composition c in entries.compositions)
                     {
                         SpawnPositionPattern pattern = c.spawnPattern;
+                        Vector3? compositionAnchor = null;  // グループ生成の基準位置を保持する変数
 
                         for (int i = 0; i < c.spawnCount; i++)
                         {
+                            bool isFirstInComposition = i == 0;
+
                             // 敵の生成パターンがグループだった場合
                             if (pattern == SpawnPositionPattern.Grouped)
                             {
-                                Spawn(c.enemyType, pattern);
+                                GameObject spawnedEnemy = Spawn(c.enemyType, pattern, isFirstInComposition, compositionAnchor);
+                                if (isFirstInComposition)
+                                {
+                                    compositionAnchor = spawnedEnemy.transform.position;
+                                }
+
                                 yield return null;
                             }
                             else if (pattern == SpawnPositionPattern.Random)     // 敵の生成パターンがランダムだった場合
                             {
-                                Spawn(c.enemyType, pattern);
+                                Spawn(c.enemyType, pattern, isFirstInComposition, compositionAnchor);
                                 yield return new WaitForSeconds(c.spawnInterval);     // 個々の敵の生成間隔を待機
                             }
                         }
@@ -71,25 +79,20 @@ namespace Enemy
         /// <summary>
         /// 敵の生成処理
         /// </summary>
-        void Spawn(EnemyType enemy, SpawnPositionPattern pattern)
+        GameObject Spawn(EnemyType enemy, SpawnPositionPattern pattern, bool isFirstInComposition, Vector3? compositionAnchor)
         {
             Vector3 spawnPos;
-            if (ActiveEnemies.Count == 0)        // 最初の敵を生成するときはランダムな位置に生成
+            if (isFirstInComposition)        // 各Compositionの最初の敵はランダムな位置に生成
             {
-                //! 最初の敵はランダムな位置に生成(ランダム固定)
                 spawnPos = EnemySpawnConfig.GetSpawnPosition(SpawnPositionPattern.Random);
             }
-            else        // 2体目以降
+            else if (pattern == SpawnPositionPattern.Grouped && compositionAnchor.HasValue)
             {
-                // グループ化された位置を取得
-                if (pattern == SpawnPositionPattern.Grouped)
-                {
-                    spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern, ActiveEnemies[0].transform.position); // グループ化された位置の取得
-                }
-                else        // ランダムな位置を取得
-                {
-                    spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern);       // 生成位置の取得
-                }
+                spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern, compositionAnchor.Value); // Composition先頭を基準にグループ生成
+            }
+            else
+            {
+                spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern);       // 生成位置の取得
             }
 
             GameObject spawnedEnemy = Instantiate(enemyContainer.GetEnemyPrefab(enemy), spawnPos, Quaternion.identity);
@@ -101,6 +104,7 @@ namespace Enemy
             }
 
             ActiveEnemies.Add(spawnedEnemy);
+            return spawnedEnemy;
         }
 
         /// <summary>

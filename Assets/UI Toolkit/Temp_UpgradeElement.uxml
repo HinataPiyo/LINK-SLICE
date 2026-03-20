@@ -1,6 +1,6 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Style/UpgradeElement_Style.uss?fileID=7433441132597879392&amp;guid=44b5e9ec35c4e94489c426d8b4c927cb&amp;type=3#UpgradeElement_Style" />
-    <ui:Button class="button" style="flex-grow: 1; margin-top: 15px; margin-right: 15px; margin-bottom: 15px; margin-left: 15px;">
+    <ui:Button class="button" style="margin-top: 15px; margin-right: 15px; margin-bottom: 15px; margin-left: 15px; max-width: 250px;">
         <ui:VisualElement name="icon-box" picking-mode="Ignore" style="justify-content: center; flex-direction: row; padding-top: 15px; padding-right: 15px; padding-bottom: 15px; padding-left: 15px;">
             <ui:VisualElement name="icon-value" picking-mode="Ignore" style="background-color: rgb(255, 255, 255); border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; height: 100px; width: 100px;" />
         </ui:VisualElement>
