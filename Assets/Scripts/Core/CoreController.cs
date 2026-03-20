@@ -28,6 +28,34 @@ namespace Core
         }
 
         /// <summary>
+        /// ネットワークスポーン時の処理。
+        /// HealthコンポーネントのHealthStateChangedイベントにCoreVisualUpdateメソッドを登録する。
+        /// </summary>
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (health != null)
+            {
+                health.HealthStateChanged += CoreVisualUpdate;
+            }
+            if(!IsClient) return;       // クライアントでない場合は処理を行わない
+            CoreVisualUpdate();         // ネットワークスポーン時にローカルのビジュアルを更新する
+        }
+
+        /// <summary>
+        /// ネットワークデスポーン時の処理。
+        /// HealthコンポーネントのHealthStateChangedイベントからCoreVisualUpdateメソッドを解除する。
+        /// </summary>
+        public override void OnNetworkDespawn()
+        {
+            if (health != null)
+            {
+                health.HealthStateChanged -= CoreVisualUpdate;
+            }
+            base.OnNetworkDespawn();
+        }
+
+        /// <summary>
         /// 四角の回転処理
         /// </summary>
         void SquareRotationUpdate()
@@ -38,9 +66,11 @@ namespace Core
         /// <summary>
         /// コアのビジュアルを更新する処理
         /// </summary>
-        void CoreVisualUpdate()
+        public void CoreVisualUpdate()
         {
             if (energyCircleTransform == null) return;
+            if (health == null) return;
+            if (health.MaxHealth <= 0) return;   // 最大体力が0以下の場合はエネルギーの割合を計算できないため、処理を行わない
 
             float energyRatio = Mathf.Clamp01((float)health.CurrentHealth / health.MaxHealth);   // 現在の体力と最大体力からエネルギーの割合を計算する
             Debug.Log($"CurrentHealth: {health.CurrentHealth}, MaxHealth: {health.MaxHealth}, EnergyRatio: {energyRatio}");
@@ -53,8 +83,8 @@ namespace Core
         [ClientRpc]
         public void CoreVisualUpdateClientRpc()
         {
-            if (!IsSpawned) return;  // オブジェクトがスポーンされていない場合は処理を行わない
-            if (!IsClient) return;    // クライアントでない場合は処理を行わない
+            if (!IsSpawned) return;     // オブジェクトがスポーンされていない場合は処理を行わない
+            if (!IsClient) return;      // クライアントでない場合は処理を行わない
             CoreVisualUpdate();
         }
     }

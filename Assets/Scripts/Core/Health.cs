@@ -10,7 +10,6 @@ namespace Core
         protected override void Initialize()
         {
             coreCtrl = GetComponent<CoreController>();
-            coreCtrl.CoreVisualUpdateClientRpc();
         }
 
         /// <summary>
@@ -23,8 +22,6 @@ namespace Core
             if (IsDead) return;
 
             currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
-
-            coreCtrl.CoreVisualUpdateClientRpc();     // ダメージを受けたときの処理を呼び出す
 
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合
             {
@@ -53,7 +50,6 @@ namespace Core
             int max = Mathf.RoundToInt(defaultMaxHealth * (1f + percent));     // 最大体力を増加させる
             currentHealth.Value = max;     // 現在の体力も最大体力に合わせて回復させる
             MaxHealth = max;     // 最大体力を更新する
-            coreCtrl.CoreVisualUpdateClientRpc();     // ビジュアルの更新
 
             Debug.Log($"Health upgraded! New MaxHealth: {max}, CurrentHealth: {CurrentHealth}");
         }

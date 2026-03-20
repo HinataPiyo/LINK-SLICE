@@ -172,7 +172,7 @@ namespace PlayerSystem.Link
         void OnAttack(IDamageable damageableTarget)
         {
             if (!CanProcessAttack) return;
-            if(attackCooldownRoutine != null) return;     // 攻撃のクールダウン中は攻撃できない
+            if (attackCooldownRoutine != null) return;     // 攻撃のクールダウン中は攻撃できない
             attackCooldownRoutine = StartCoroutine(AttackCooldownRoutine(damageableTarget));     // 攻撃のクールダウンを開始する
         }
 

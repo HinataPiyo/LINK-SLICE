@@ -10,8 +10,14 @@ namespace Common
         [SerializeField] protected int defaultMaxHealth = 1;
         [SerializeField] Die dieEffectPrefab;
         protected NetworkVariable<int> currentHealth = new NetworkVariable<int>();
+        protected NetworkVariable<int> maxHealth = new NetworkVariable<int>();
+        public event System.Action HealthStateChanged;
 
-        public int MaxHealth;
+        public int MaxHealth
+        {
+            get => IsSpawned ? maxHealth.Value : defaultMaxHealth;
+            protected set => maxHealth.Value = value;
+        }
         public Vector2 GetPosition()
         {
             if(!IsSpawned)
@@ -33,11 +39,30 @@ namespace Common
         {
             base.OnNetworkSpawn();
 
-            if (IsServer)
-            {
-                MaxHealth = defaultMaxHealth;
-                currentHealth.Value = MaxHealth;
-            }
+            currentHealth.OnValueChanged += OnHealthValueChanged;
+            maxHealth.OnValueChanged += OnMaxHealthValueChanged;
+
+            if (!IsServer) return;  // サーバーでなければ、以降の処理をスキップ
+
+            MaxHealth = defaultMaxHealth;
+            currentHealth.Value = MaxHealth;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            currentHealth.OnValueChanged -= OnHealthValueChanged;
+            maxHealth.OnValueChanged -= OnMaxHealthValueChanged;
+            base.OnNetworkDespawn();
+        }
+
+        void OnHealthValueChanged(int previousValue, int newValue)
+        {
+            HealthStateChanged?.Invoke();
+        }
+
+        void OnMaxHealthValueChanged(int previousValue, int newValue)
+        {
+            HealthStateChanged?.Invoke();
         }
 
         /// <summary>
