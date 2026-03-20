@@ -49,8 +49,9 @@ namespace PlayerSystem
             // RuntimeStats が存在する場合は、アップグレード反映後の最終攻撃力を優先して使用する。
             // フォールバックを残すことで、注入漏れ時にも最低限従来挙動を維持する。
             int damage = runtimeStats != null ? runtimeStats.CurrentStrength : playerConfig.Link.strength;
+            float interval = runtimeStats != null ? runtimeStats.CurrentInterval : playerConfig.Link.attackIntarval;
             damageableTarget.ApplyDamage(damage);
-            yield return new WaitForSeconds(playerConfig.Link.attackIntarval);
+            yield return new WaitForSeconds(interval);
             attackCooldownRoutines.Remove(targetId);
         }
 

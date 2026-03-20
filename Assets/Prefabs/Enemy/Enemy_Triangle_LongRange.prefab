@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: dieEffectPrefab
       value: 
       objectReference: {fileID: 2935652144093452778, guid: f5ee5da683e3417498f37f2cc5078701, type: 3}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: defaultMaxHealth
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: m_Name
       value: Enemy_Triangle_LongRange
