@@ -45,16 +45,16 @@ namespace UI.Module
             if (!IsServer || entries == null) return;
 
             int[] definitionIndices = new int[entries.Length];      // UpgradeDefinitionのインデックスをクライアントに送るための配列
-            int[] activeCounts = new int[entries.Length];           // 各Upgradeの適用回数をクライアントに送るための配列
+            int[] currentLevels = new int[entries.Length];          // 各Upgradeの現在レベルをクライアントへ送るための配列
             for (int i = 0; i < entries.Length; i++)
             {
-                // UpgradeManagerのEntryからUpgradeDefinitionのインデックスと適用回数を抽出して配列に格納する
+                // クライアント側でも同じ候補内容を再構築できるよう、定義の参照情報と現在レベルだけを送る。
                 definitionIndices[i] = UpgradeManager.I.GetUpgradeDefinitionIndex(entries[i].data);
-                activeCounts[i] = entries[i].activeCount;       // クライアント側でUIを表示する際に、Upgradeの内容と適用回数を正確に反映させるために必要な情報を送る
+                currentLevels[i] = entries[i].currentLevel;
             }
 
             // クライアントにUpgrade選択UIを表示するためのClientRpcを呼び出す
-            ShowUpgradeSelectionClientRpc(definitionIndices, activeCounts);
+            ShowUpgradeSelectionClientRpc(definitionIndices, currentLevels);
         }
 
         /// <summary>
@@ -72,15 +72,15 @@ namespace UI.Module
         /// クライアントにUpgrade選択UIを表示するためのClientRpc。サーバーから呼び出される。
         /// </summary>
         /// <param name="definitionIndices"> UpgradeDefinitionのインデックスの配列。クライアントはこのインデックスを使用して、表示するUpgradeの内容をUpgradeManagerから取得する。</param>
-        /// <param name="activeCounts"> 各Upgradeの適用回数の配列。クライアントはこの情報を使用して、UIに適用回数を表示するなど、Upgradeの内容を正確に反映させる。</param>
+        /// <param name="currentLevels"> 各Upgradeの現在レベルの配列。クライアントはこの情報から、今回提示されるレベルと説明文を再構築する。</param>
         [ClientRpc]
-        void ShowUpgradeSelectionClientRpc(int[] definitionIndices, int[] activeCounts)
+        void ShowUpgradeSelectionClientRpc(int[] definitionIndices, int[] currentLevels)
         {
             if (!IsClient) return;
 
             Initialize();
             // クライアント側でUpgrade選択UIを表示するための処理をここに実装する
-            SelectUpgradeElement.ViewData[] viewData = UpgradeManager.I.CreateViewData(definitionIndices, activeCounts);
+            SelectUpgradeElement.ViewData[] viewData = UpgradeManager.I.CreateViewData(definitionIndices, currentLevels);
             m_SelectUpgradeElement.Show(viewData, HandleUpgradeSelected);       // UIの表示と、Upgradeが選択されたときのコールバックを設定する
         }
 

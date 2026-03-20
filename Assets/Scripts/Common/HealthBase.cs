@@ -1,5 +1,6 @@
 namespace Common
 {
+    using System.Collections.Generic;
     using Common.Effect;
     using UnityEngine;
     using Unity.Netcode;
@@ -11,6 +12,8 @@ namespace Common
         [SerializeField] Die dieEffectPrefab;
         protected NetworkVariable<int> currentHealth = new NetworkVariable<int>();
         protected NetworkVariable<int> maxHealth = new NetworkVariable<int>();
+        readonly Dictionary<string, int> maxHealthFlatModifiers = new Dictionary<string, int>();
+        readonly Dictionary<string, float> maxHealthPercentModifiers = new Dictionary<string, float>();
         public event System.Action HealthStateChanged;
 
         public int MaxHealth
@@ -44,8 +47,8 @@ namespace Common
 
             if (!IsServer) return;  // サーバーでなければ、以降の処理をスキップ
 
-            MaxHealth = defaultMaxHealth;
-            currentHealth.Value = MaxHealth;
+            // スポーン直後は基礎値と現在有効な Modifier をまとめて反映し、初期体力を最大値へ揃える。
+            RecalculateMaxHealth(resetCurrentHealth: true);
         }
 
         public override void OnNetworkDespawn()
@@ -83,6 +86,102 @@ namespace Common
             if (IsDead) return;
 
             TakeDamageInternal(damage);
+        }
+
+        /// <summary>
+        /// 最大体力に対する固定値 Modifier を設定する。
+        /// sourceId 単位で上書きすることで、同じ効果の再計算時に二重加算を防ぐ。
+        /// </summary>
+        public void SetMaxHealthFlatModifier(string sourceId, int value)
+        {
+            if (!IsServer || !IsSpawned) return;
+            if (string.IsNullOrWhiteSpace(sourceId))
+            {
+                Debug.LogWarning("最大体力の固定値 Modifier に空の sourceId は使用できません。");
+                return;
+            }
+
+            maxHealthFlatModifiers[sourceId] = value;
+            RecalculateMaxHealth();
+        }
+
+        /// <summary>
+        /// 最大体力に対する割合 Modifier を設定する。
+        /// 永続アップグレード、一時バフ、デバフを同じ仕組みで扱えるようにするための入口。
+        /// </summary>
+        public void SetMaxHealthPercentModifier(string sourceId, float value)
+        {
+            if (!IsServer || !IsSpawned) return;
+            if (string.IsNullOrWhiteSpace(sourceId))
+            {
+                Debug.LogWarning("最大体力の割合 Modifier に空の sourceId は使用できません。");
+                return;
+            }
+
+            maxHealthPercentModifiers[sourceId] = value;
+            RecalculateMaxHealth();
+        }
+
+        /// <summary>
+        /// sourceId 指定の Modifier をまとめて解除する。
+        /// 一時効果の終了やリセット処理を同じ API で扱えるようにしておく。
+        /// </summary>
+        public void RemoveMaxHealthModifier(string sourceId)
+        {
+            if (!IsServer || !IsSpawned) return;
+            if (string.IsNullOrWhiteSpace(sourceId)) return;
+
+            bool removedFlat = maxHealthFlatModifiers.Remove(sourceId);
+            bool removedPercent = maxHealthPercentModifiers.Remove(sourceId);
+
+            if (removedFlat || removedPercent)
+            {
+                RecalculateMaxHealth();
+            }
+        }
+
+        /// <summary>
+        /// 現在有効な Modifier から最大体力を再構築する。
+        /// アップグレード側は最終値を直接書き換えず、Modifier を登録するだけにすると責務が明確になる。
+        /// </summary>
+        protected void RecalculateMaxHealth(bool resetCurrentHealth = false)
+        {
+            int recalculatedMaxHealth = CalculateMaxHealth();
+            MaxHealth = recalculatedMaxHealth;
+
+            if (resetCurrentHealth)
+            {
+                currentHealth.Value = MaxHealth;
+                return;
+            }
+
+            // 既存挙動を大きく変えないため、現在体力は自動回復させず、最大値超過だけを丸める。
+            if (currentHealth.Value > MaxHealth)
+            {
+                currentHealth.Value = MaxHealth;
+            }
+        }
+
+        /// <summary>
+        /// 最大体力の最終値計算。
+        /// 計算式を1箇所へ集約しておくと、将来の体力関連アップグレード追加時にも変更点が限定される。
+        /// </summary>
+        protected virtual int CalculateMaxHealth()
+        {
+            int flatBonus = 0;
+            foreach (int value in maxHealthFlatModifiers.Values)
+            {
+                flatBonus += value;
+            }
+
+            float percentBonus = 0f;
+            foreach (float value in maxHealthPercentModifiers.Values)
+            {
+                percentBonus += value;
+            }
+
+            int baseHealthWithFlatBonus = Mathf.Max(1, defaultMaxHealth + flatBonus);
+            return Mathf.Max(1, Mathf.RoundToInt(baseHealthWithFlatBonus * (1f + percentBonus)));
         }
 
         /// <summary>

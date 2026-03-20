@@ -36,19 +36,5 @@ namespace Core
             if (!IsServer) return;
             base.Die();
         }
-
-        /// <summary>
-        /// 体力をアップグレードする処理。
-        /// アップグレードの効果に応じて体力を増加させる。
-        /// </summary>
-        /// <param name="percent"> 体力増加の割合（例: 0.1f は10%増加）</param>
-        public void UpgradeHealth(float percent)
-        {
-            if (!IsServer) return;
-            int max = Mathf.RoundToInt(defaultMaxHealth * (1f + percent));     // 最大体力を増加させる
-            MaxHealth = max;     // 最大体力を更新する
-
-            Debug.Log($"Health upgraded! New MaxHealth: {max}, CurrentHealth: {CurrentHealth}");
-        }
     }
 }
