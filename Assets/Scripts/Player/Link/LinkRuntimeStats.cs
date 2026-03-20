@@ -117,8 +117,8 @@ namespace PlayerSystem.Link
                 percentBonus += value;
             }
 
-            float intervalWithFlatBonus = Mathf.Max(0.1f, baseInterval + flatBonus);
-            CurrentInterval = Mathf.Max(0.1f, intervalWithFlatBonus * (1f + percentBonus));
+            float intervalWithFlatBonus = Mathf.Max(0.1f, baseInterval - flatBonus);            // 攻撃間隔はあまりに短くなりすぎないように最低値を設定している。
+            CurrentInterval = Mathf.Max(0.1f, intervalWithFlatBonus * (1f - percentBonus));     // 同様に、割合 Modifier も合わせて最低値を設定している。
         }
 #endregion
 

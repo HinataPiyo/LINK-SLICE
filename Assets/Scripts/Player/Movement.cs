@@ -1,11 +1,22 @@
 namespace PlayerSystem
 {
+    using PlayerSystem.Link;
     using UnityEngine;
     using Unity.Netcode;
 
     public class Movement : NetworkBehaviour
     {
         [SerializeField] float moveSpeed = 5f;
+
+        void OnEnable()
+        {
+            LinkController.RegisterPlayer(transform);
+        }
+
+        void OnDisable()
+        {
+            LinkController.UnregisterPlayer(transform);
+        }
 
         void Update()
         {

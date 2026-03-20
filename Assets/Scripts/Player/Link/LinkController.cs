@@ -10,13 +10,19 @@ namespace PlayerSystem.Link
     {
         public static LinkController I { get; private set; }
 
+        static readonly HashSet<Transform> registeredPlayers = new HashSet<Transform>();
+
         [Header("生成設定")]
         [SerializeField] PlayerConfig playerConfig;
         [SerializeField] Transform spawnParent;     // Linkを生成する親オブジェクト（未設定ならこのオブジェクトの子として生成）
 
+        [Header("デバッグ設定")]
+        [SerializeField] bool collectExistingPlayersForDebug = true;
+
         readonly Dictionary<long, LinkRuntime> linkRuntimes = new Dictionary<long, LinkRuntime>();
         readonly List<Transform> players = new List<Transform>();
         readonly HashSet<long> activePairKeys = new HashSet<long>();
+        readonly HashSet<Transform> playerLookup = new HashSet<Transform>();
 
         float targetDistanceSqr;
         float targetDistance;
@@ -29,6 +35,38 @@ namespace PlayerSystem.Link
             public Link spawnedLink;
             public Coroutine breakRoutine;
             public bool pendingRemoval;
+        }
+
+        public static void RegisterPlayer(Transform player)
+        {
+            if (player == null) return;
+
+            registeredPlayers.Add(player);
+            I?.AddPlayer(player);
+        }
+
+        public static void UnregisterPlayer(Transform player)
+        {
+            if (player == null) return;
+
+            registeredPlayers.Remove(player);
+            I?.RemovePlayer(player);
+        }
+
+        public static bool TryGetLocalOwnedPlayer(out Transform player)
+        {
+            foreach (Transform registeredPlayer in registeredPlayers)
+            {
+                if (registeredPlayer == null || !registeredPlayer.gameObject.activeInHierarchy) continue;
+                if (!registeredPlayer.TryGetComponent(out Movement movement)) continue;
+                if (!movement.IsSpawned || !movement.IsOwner) continue;
+
+                player = registeredPlayer;
+                return true;
+            }
+
+            player = null;
+            return false;
         }
 
         void Awake()
@@ -45,29 +83,86 @@ namespace PlayerSystem.Link
             runtimeStats.Initialize(playerConfig);
             targetDistance = playerConfig.Link.distance;
             targetDistanceSqr = targetDistance * targetDistance;        // 0除算防止
+
+            CollectExistingPlayersForDebugIfNeeded();
+            SyncRegisteredPlayers();
         }
 
         void Update()
         {
-            CollectPlayers(players);
+            CleanupPlayers();
             UpdateLinks();
         }
 
+#region Debug
+
         /// <summary>
-        /// シーン内のMovementコンポーネントをプレイヤーとして収集する。
+        /// デバッグ用に、すでにシーン上へ存在しているMovementを一度だけ登録する。
+        /// 本番で不要になったら collectExistingPlayersForDebug をOFFにするか、このメソッドごと削除する。
         /// </summary>
-        /// <param name="result"></param>
-        void CollectPlayers(List<Transform> result)
+        void CollectExistingPlayersForDebugIfNeeded()
         {
-            result.Clear();
-            Movement[] fallbackPlayers = FindObjectsByType<Movement>(FindObjectsSortMode.None);
-            for (int i = 0; i < fallbackPlayers.Length; i++)
+            if (!collectExistingPlayersForDebug) return;
+
+            CollectExistingPlayersForDebug();
+        }
+
+        /// <summary>
+        /// デバッグ用の既存プレイヤー収集を手動実行する。
+        /// </summary>
+        [ContextMenu("Collect Existing Players For Debug")]
+        void CollectExistingPlayersForDebug()
+        {
+            Movement[] existingPlayers = FindObjectsByType<Movement>(FindObjectsSortMode.None);
+            for (int i = 0; i < existingPlayers.Length; i++)
             {
-                Movement movement = fallbackPlayers[i];
+                Movement movement = existingPlayers[i];
                 if (movement == null || !movement.gameObject.activeInHierarchy) continue;
 
-                result.Add(movement.transform);
+                RegisterPlayer(movement.transform);
             }
+        }
+#endregion
+        /// <summary>
+        /// 事前登録済みのプレイヤーを内部キャッシュに同期する。
+        /// </summary>
+        void SyncRegisteredPlayers()
+        {
+            foreach (Transform player in registeredPlayers)
+            {
+                AddPlayer(player);
+            }
+        }
+
+        /// <summary>
+        /// キャッシュ済みのプレイヤー一覧から無効な参照を除外する。
+        /// </summary>
+        void CleanupPlayers()
+        {
+            for (int i = players.Count - 1; i >= 0; i--)
+            {
+                Transform player = players[i];
+                if (player != null && player.gameObject.activeInHierarchy) continue;
+
+                players.RemoveAt(i);
+                playerLookup.Remove(player);
+            }
+        }
+
+        void AddPlayer(Transform player)
+        {
+            if (player == null || !player.gameObject.activeInHierarchy) return;
+            if (!playerLookup.Add(player)) return;
+
+            players.Add(player);
+        }
+
+        void RemovePlayer(Transform player)
+        {
+            if (player == null) return;
+            if (!playerLookup.Remove(player)) return;
+
+            players.Remove(player);
         }
 
         /// <summary>
@@ -215,6 +310,11 @@ namespace PlayerSystem.Link
         /// </summary>
         void OnDestroy()
         {
+            if (I == this)
+            {
+                I = null;
+            }
+
             // 破棄演出のコルーチンが走っている場合は停止する
             foreach (LinkRuntime runtime in linkRuntimes.Values)
             {
@@ -232,6 +332,8 @@ namespace PlayerSystem.Link
             }
 
             linkRuntimes.Clear();
+            players.Clear();
+            playerLookup.Clear();
         }
 
         /// <summary>

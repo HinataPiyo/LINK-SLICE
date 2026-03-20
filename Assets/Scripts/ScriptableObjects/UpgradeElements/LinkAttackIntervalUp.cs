@@ -10,7 +10,7 @@ namespace Upgrade.Data
 
         public override string GetDescription(int offeredLevel)
         {
-            return $"リンクの攻撃間隔が{intervalPercentBonus * 100f}%増加する。";
+            return $"リンクの攻撃間隔が{intervalPercentBonus * 100f}%低下する。";
         }
 
         /// <summary>
