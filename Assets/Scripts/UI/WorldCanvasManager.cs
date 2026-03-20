@@ -18,7 +18,7 @@ namespace UI
         /// </summary>
         /// <param name="position"></param>
         /// <param name="damageAmount"></param>
-        public void ShowApplyDamageUI(Vector2 position, int damageAmount)
+        public void ShowApplyDamageUI(Vector3 position, int damageAmount)
         {
             if (applyDamageUIPrefab == null)
             {

@@ -1,5 +1,6 @@
 namespace Enemy
 {
+    using Unity.Netcode;
     using UnityEngine;
     using Common;
     using UI;
@@ -18,13 +19,24 @@ namespace Enemy
             if (IsDead) return;
 
             int health = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
-            WorldCanvasManager.I.ShowApplyDamageUI(transform.position, damage);     // ダメージを受けた位置にダメージ量を表示するUIを生成して表示する
+            ShowApplyDamageUIClientRpc(transform.position, damage);     // 各クライアントでローカルにダメージUIを生成して表示する
             
             currentHealth.Value = health;
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合
             {
                 Die();      // 死亡処理
             }
+        }
+
+        [ClientRpc]
+        void ShowApplyDamageUIClientRpc(Vector3 position, int damage)
+        {
+            if (WorldCanvasManager.I == null)
+            {
+                return;
+            }
+
+            WorldCanvasManager.I.ShowApplyDamageUI(position, damage);
         }
         
         /// <summary>

@@ -12,6 +12,9 @@ namespace UI.Module
 
         VisualElement moduleRoot;
 
+        /// <summary>
+        /// Upgradeの選択肢を表示するためのデータ構造。
+        /// </summary>
         public readonly struct ViewData
         {
             public readonly Sprite Icon;
@@ -19,6 +22,9 @@ namespace UI.Module
             public readonly string Name;
             public readonly string Description;
 
+            /// <summary>
+            /// ViewDataのコンストラクタ。
+            /// </summary>
             public ViewData(Sprite icon, int level, string name, string description)
             {
                 Icon = icon;
@@ -28,6 +34,9 @@ namespace UI.Module
             }
         }
 
+        /// <summary>
+        /// IUIModuleHandlerの実装。UpgradeModuleControllerから呼び出される。
+        /// </summary>
         public void Initialize(VisualElement moduleRoot)
         {
             this.moduleRoot = moduleRoot;
@@ -37,8 +46,8 @@ namespace UI.Module
             uiElements = moduleRoot.Q<VisualElement>("elements").Query<TemplateContainer>().ToList().ToArray();
             for (int i = 0; i < uiElements.Length; i++)
             {
-                uiElements[i].name = $"element{i}";
-                UpgradeElement upgradeElement = new UpgradeElement(uiElements[i]);
+                uiElements[i].name = $"element{i}";     // UI要素に一意の名前を設定する
+                UpgradeElement upgradeElement = new UpgradeElement(uiElements[i]);      // UpgradeElementのインスタンスを作成してリストに追加する
                 upgradeElements.Add(upgradeElement);
             }
 
@@ -50,11 +59,6 @@ namespace UI.Module
         /// </summary>
         public void Hide()
         {
-            if (moduleRoot == null)
-            {
-                return;
-            }
-
             moduleRoot.style.display = DisplayStyle.None;
         }
 
@@ -63,11 +67,6 @@ namespace UI.Module
         /// </summary>
         public void Show(ViewData[] entries, Action<int> onClick)
         {
-            if (moduleRoot == null)
-            {
-                return;
-            }
-
             moduleRoot.style.display = DisplayStyle.Flex;
 
             for (int i = 0; i < upgradeElements.Count; i++)
@@ -122,13 +121,10 @@ namespace UI.Module
                 this.level.text = $"レベル{level}";
                 this.description.text = description;
 
-                if (clickHandler != null)
-                {
-                    button.clicked -= clickHandler;
-                }
+                if (clickHandler != null) button.clicked -= clickHandler;       // 既存のクリックハンドラーがある場合は削除する
 
-                clickHandler = () => onClick?.Invoke();
-                button.clicked += clickHandler;
+                clickHandler = () => onClick?.Invoke();     // 新しいクリックハンドラーを設定する
+                button.clicked += clickHandler;             // ボタンのクリックイベントにハンドラーを追加する
             }
 
             /// <summary>
