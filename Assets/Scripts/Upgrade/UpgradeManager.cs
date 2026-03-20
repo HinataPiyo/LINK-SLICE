@@ -2,6 +2,7 @@ namespace Upgrade
 {
     using System;
     using System.Collections.Generic;
+    using Unity.Netcode;
     using UI.Module;
     using UnityEngine;
     using UnityEngine.UI;
@@ -13,6 +14,7 @@ namespace Upgrade
         [SerializeField] UpgradeModuleController uiCtrl;
         [SerializeField] UpgradeDatabase upgradeDatabase;
         readonly Dictionary<Type, Entry> activeEffects = new Dictionary<Type, Entry>();
+        Entry[] currentEntries;
 
         public bool IsUpgraded { get; private set; } = false;    // アップグレードが適用されたかどうかを示すフラグ
 
@@ -57,7 +59,24 @@ namespace Upgrade
                 entries.Add(entry);
             }
 
-            uiCtrl.m_SelectUpgradeElement.Show(entries.ToArray());   // UIを表示して、選出されたUpgradeの内容を渡す
+            currentEntries = entries.ToArray();
+            uiCtrl.ShowUpgradeSelection(currentEntries);   // UIを表示して、選出されたUpgradeの内容を渡す
+        }
+
+        public void ApplyUpgradeAt(int selectedIndex)
+        {
+            if (!IsUpgraded || currentEntries == null)
+            {
+                return;
+            }
+
+            if (selectedIndex < 0 || selectedIndex >= currentEntries.Length)
+            {
+                Debug.LogWarning($"無効なアップグレード選択です: {selectedIndex}");
+                return;
+            }
+
+            ApplyUpgrade(currentEntries[selectedIndex].data);
         }
 
         /// <summary>
@@ -75,7 +94,58 @@ namespace Upgrade
             if (data is Data.CoreHealthUp) ApplyCoreHealthUpgrade();
 
             ChangeUpgradeFlag(false);   // アップグレードが適用された後、UpgradeManagerのフラグをfalseにする
-            uiCtrl.m_SelectUpgradeElement.Hide();    // アップグレードが適用された後、UIを非表示にする
+            currentEntries = null;
+
+            if (uiCtrl != null)
+            {
+                if (uiCtrl.IsSpawned && uiCtrl.IsServer)
+                {
+                    uiCtrl.HideUpgradeSelection();
+                }
+                else
+                {
+                    uiCtrl.m_SelectUpgradeElement.Hide();
+                }
+            }
+        }
+
+        public int GetUpgradeDefinitionIndex(UpgradeDefinition definition)
+        {
+            if (upgradeDatabase == null || definition == null)
+            {
+                return -1;
+            }
+
+            return upgradeDatabase.IndexOf(definition);
+        }
+
+        public SelectUpgradeElement.ViewData[] CreateViewData(int[] definitionIndices, int[] activeCounts)
+        {
+            if (upgradeDatabase == null || definitionIndices == null)
+            {
+                return Array.Empty<SelectUpgradeElement.ViewData>();
+            }
+
+            SelectUpgradeElement.ViewData[] viewData = new SelectUpgradeElement.ViewData[definitionIndices.Length];
+            for (int i = 0; i < definitionIndices.Length; i++)
+            {
+                UpgradeDefinition definition = upgradeDatabase.GetUpgradeDefinitionAt(definitionIndices[i]);
+                int activeCount = activeCounts != null && i < activeCounts.Length ? activeCounts[i] : 0;
+
+                if (definition == null)
+                {
+                    Debug.LogWarning($"UpgradeDefinition が見つかりません: index={definitionIndices[i]}");
+                    continue;
+                }
+
+                viewData[i] = new SelectUpgradeElement.ViewData(
+                    definition.icon,
+                    activeCount,
+                    definition.upgradeName,
+                    definition.GetDescription());
+            }
+
+            return viewData;
         }
 
         /// <summary>

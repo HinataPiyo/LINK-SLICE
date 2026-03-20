@@ -1,9 +1,10 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI.Base
 {
-    public abstract class ModuleControllerBase : MonoBehaviour
+    public abstract class ModuleControllerBase : NetworkBehaviour
     {
         [SerializeField] protected PlayerConfig playerConfig;
         

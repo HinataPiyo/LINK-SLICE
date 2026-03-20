@@ -13,6 +13,21 @@ namespace Upgrade
             return upgrades.Find(upgrade => upgrade is T) as T;     // 指定された型のUpgradeDefinitionを検索して返す
         }
 
+        public int IndexOf(UpgradeDefinition definition)
+        {
+            return upgrades.IndexOf(definition);
+        }
+
+        public UpgradeDefinition GetUpgradeDefinitionAt(int index)
+        {
+            if (index < 0 || index >= upgrades.Count)
+            {
+                return null;
+            }
+
+            return upgrades[index];
+        }
+
         /// <summary>
         /// アップグレードの定義をランダムに選出して返す処理をここに実装する
         /// </summary>

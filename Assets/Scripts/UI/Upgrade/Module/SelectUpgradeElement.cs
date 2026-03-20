@@ -1,9 +1,9 @@
 namespace UI.Module
 {
+    using System;
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.UIElements;
-    using Upgrade;
 
     public class SelectUpgradeElement : MonoBehaviour, IUIModuleHandler
     {
@@ -11,9 +11,27 @@ namespace UI.Module
         List<UpgradeElement> upgradeElements = new List<UpgradeElement>();
 
         VisualElement moduleRoot;
+
+        public readonly struct ViewData
+        {
+            public readonly Sprite Icon;
+            public readonly int Level;
+            public readonly string Name;
+            public readonly string Description;
+
+            public ViewData(Sprite icon, int level, string name, string description)
+            {
+                Icon = icon;
+                Level = level;
+                Name = name;
+                Description = description;
+            }
+        }
+
         public void Initialize(VisualElement moduleRoot)
         {
             this.moduleRoot = moduleRoot;
+            upgradeElements.Clear();
 
             // ここで、moduleRootを使用してUI要素の初期化を行う
             uiElements = moduleRoot.Q<VisualElement>("elements").Query<TemplateContainer>().ToList().ToArray();
@@ -32,25 +50,34 @@ namespace UI.Module
         /// </summary>
         public void Hide()
         {
+            if (moduleRoot == null)
+            {
+                return;
+            }
+
             moduleRoot.style.display = DisplayStyle.None;
         }
 
         /// <summary>
         /// UIを表示する
         /// </summary>
-        public void Show(UpgradeManager.Entry[] entries)
+        public void Show(ViewData[] entries, Action<int> onClick)
         {
+            if (moduleRoot == null)
+            {
+                return;
+            }
+
             moduleRoot.style.display = DisplayStyle.Flex;
 
-            // entriesの内容に基づいてUIを更新する処理をここに実装する
             for (int i = 0; i < upgradeElements.Count; i++)
             {
                 UpgradeElement upgradeElement = upgradeElements[i];
                 if(i < entries.Length)
                 {
-                    UpgradeManager.Entry entry = entries[i];
-                    // entryの内容をupgradeElementのUIに反映する処理をここに実装する
-                    upgradeElement.UpdateUI(entry.data.icon, entry.activeCount, entry.data.upgradeName, entry.data.GetDescription(), entry.onClickAction);
+                    ViewData entry = entries[i];
+                    int selectedIndex = i;
+                    upgradeElement.UpdateUI(entry.Icon, entry.Level, entry.Name, entry.Description, () => onClick?.Invoke(selectedIndex));
                 }
                 else
                 {
@@ -68,6 +95,7 @@ namespace UI.Module
             Label description;
 
             Button button;
+            Action clickHandler;
 
             /// <summary>
             /// UpgradeElementクラスのコンストラクタ。
@@ -93,7 +121,14 @@ namespace UI.Module
                 this.name.text = name;
                 this.level.text = $"レベル{level}";
                 this.description.text = description;
-                button.clicked += () => onClick?.Invoke();
+
+                if (clickHandler != null)
+                {
+                    button.clicked -= clickHandler;
+                }
+
+                clickHandler = () => onClick?.Invoke();
+                button.clicked += clickHandler;
             }
 
             /// <summary>
