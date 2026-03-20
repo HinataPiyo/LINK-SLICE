@@ -1715,6 +1715,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1003155408}
   - component: {fileID: 1003155409}
+  - component: {fileID: 1003155410}
   m_Layer: 0
   m_Name: LinkControl
   m_TagString: Untagged
@@ -1751,6 +1752,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
   spawnParent: {fileID: 0}
+--- !u!114 &1003155410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003155407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 666232732acc45442a87fe1e1ac0de90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1290827274
 GameObject:
   m_ObjectHideFlags: 0
@@ -7212,7 +7225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiCtrl: {fileID: 1861403314}
   upgradeDatabase: {fileID: 11400000, guid: 523552661e9b36340bc6c4bf162bbd3d, type: 2}
-  button: {fileID: 204194859}
+  selectedResultDisplaySeconds: 2.5
 --- !u!4 &1792778792
 Transform:
   m_ObjectHideFlags: 0

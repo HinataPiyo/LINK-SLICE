@@ -11,6 +11,9 @@ namespace UI.Module
         List<UpgradeElement> upgradeElements = new List<UpgradeElement>();
 
         VisualElement moduleRoot;
+        bool hasSubmittedSelection;
+
+        public bool IsInitialized => moduleRoot != null && upgradeElements.Count > 0;
 
         /// <summary>
         /// Upgradeの選択肢を表示するためのデータ構造。
@@ -60,14 +63,16 @@ namespace UI.Module
         public void Hide()
         {
             moduleRoot.style.display = DisplayStyle.None;
+            hasSubmittedSelection = false;
         }
 
         /// <summary>
         /// UIを表示する
         /// </summary>
-        public void Show(ViewData[] entries, Action<int> onClick)
+        public void Show(ViewData[] entries, int totalPlayerCount, Action<int> onClick)
         {
             moduleRoot.style.display = DisplayStyle.Flex;
+            hasSubmittedSelection = false;
 
             for (int i = 0; i < upgradeElements.Count; i++)
             {
@@ -76,12 +81,59 @@ namespace UI.Module
                 {
                     ViewData entry = entries[i];
                     int selectedIndex = i;
-                    upgradeElement.UpdateUI(entry.Icon, entry.Level, entry.Name, entry.Description, () => onClick?.Invoke(selectedIndex));
+                    upgradeElement.UpdateUI(entry.Icon, entry.Level, entry.Name, entry.Description, () =>
+                    {
+                        if (hasSubmittedSelection) return;
+
+                        hasSubmittedSelection = true;
+                        SetInteractable(false);
+                        onClick?.Invoke(selectedIndex);
+                    });
+                    upgradeElement.UpdateSelectedPlayerCount(0, totalPlayerCount);
                 }
                 else
                 {
                     upgradeElement.Hide();  // entriesの数より多いUI要素は非表示にする
                 }
+            }
+        }
+
+        public void UpdateSelectedPlayerCounts(int[] counts, int totalPlayerCount)
+        {
+            for (int i = 0; i < upgradeElements.Count; i++)
+            {
+                if (i >= counts.Length)
+                {
+                    upgradeElements[i].UpdateSelectedPlayerCount(0, totalPlayerCount);
+                    continue;
+                }
+
+                upgradeElements[i].UpdateSelectedPlayerCount(counts[i], totalPlayerCount);
+            }
+        }
+
+        public void ShowSelectedResult(int selectedIndex)
+        {
+            hasSubmittedSelection = true;
+            SetInteractable(false);
+
+            for (int i = 0; i < upgradeElements.Count; i++)
+            {
+                if (i == selectedIndex)
+                {
+                    upgradeElements[i].Show();
+                    continue;
+                }
+
+                upgradeElements[i].Hide();
+            }
+        }
+
+        void SetInteractable(bool isInteractable)
+        {
+            for (int i = 0; i < upgradeElements.Count; i++)
+            {
+                upgradeElements[i].SetInteractable(isInteractable);
             }
         }
 
@@ -92,6 +144,7 @@ namespace UI.Module
             Label name;
             Label level;
             Label description;
+            Label selectedPlayerCount;
 
             Button button;
             Action clickHandler;
@@ -107,15 +160,18 @@ namespace UI.Module
                 name = element.Q<Label>("name-value");
                 level = element.Q<Label>("level-value");
                 description = element.Q<Label>("description-value");
+                selectedPlayerCount = element.Q<Label>("selected-count-value");
                 button = element.Q<Button>();
+                UpdateSelectedPlayerCount(0, 0);     // 初期状態では選択中プレイヤー数を0人にする
             }
 
             /// <summary>
             /// UpgradeElementのUIを更新するメソッド。
             /// </summary>
-            public void UpdateUI(Sprite icon, int level, string name, string description, System.Action onClick)
+            public void UpdateUI(Sprite icon, int level, string name, string description, Action onClick)
             {
                 Show();
+                SetInteractable(true);
                 this.icon.style.backgroundImage = new StyleBackground(icon);
                 this.name.text = name;
                 this.level.text = $"レベル{level}";
@@ -125,6 +181,26 @@ namespace UI.Module
 
                 clickHandler = () => onClick?.Invoke();     // 新しいクリックハンドラーを設定する
                 button.clicked += clickHandler;             // ボタンのクリックイベントにハンドラーを追加する
+            }
+
+            /// <summary>
+            /// UpgradeElementの選択中プレイヤー数を更新するメソッド。
+            /// </summary>
+            /// <param name="count">選択中のプレイヤー数</param>
+            public void UpdateSelectedPlayerCount(int count, int totalPlayerCount)
+            {
+                if (totalPlayerCount > 0)
+                {
+                    selectedPlayerCount.text = $"選択中: {count}/{totalPlayerCount}人";
+                    return;
+                }
+
+                selectedPlayerCount.text = $"選択中: {count}人";
+            }
+
+            public void SetInteractable(bool isInteractable)
+            {
+                button?.SetEnabled(isInteractable);
             }
 
             /// <summary>
