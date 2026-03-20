@@ -92,6 +92,7 @@ namespace UI.Module
 
         /// <summary>
         /// クライアントにUpgrade選択UIの選択状況を更新するためのClientRpcを呼び出す。サーバーから呼び出される。
+        /// 各Upgradeが現在何人のプレイヤーに選択されているかを示す配列を受け取り、UIに選択状況を反映する。
         /// </summary>
         /// <param name="selectedCounts"> 各Upgradeが現在何人のプレイヤーに選択されているかを示す配列。クライアントはこの情報を使用して、UIに選択状況を反映する。</param>
         /// <param name="totalPlayerCount"> プレイヤーの総数。クライアントはこの情報を使用して、UIに選択状況を反映する際の分母として使用する。</param>
@@ -115,6 +116,7 @@ namespace UI.Module
 
         /// <summary>
         /// クライアントにUpgrade選択UIの選択結果を表示するためのClientRpcを呼び出す。サーバーから呼び出される。
+        /// クライアントはこの情報を使用して、UIに選択結果を反映する。ネットワーク非同期モードではない場合は、直接UIを表示する。
         /// </summary>
         /// <param name="selectedIndex"> クライアントが選択したUpgradeのインデックス。クライアントはこの情報を使用して、UIに選択結果を反映する。</param>
         public void ShowUpgradeSelectionResult(int selectedIndex)
@@ -142,6 +144,7 @@ namespace UI.Module
         {
             if (!IsClient) return;
 
+            // ネットワーク非同期モードではない場合は、直接UIを表示する
             ShowUpgradeSelectionLocal(definitionIndices, currentLevels, totalPlayerCount);
         }
 
@@ -211,7 +214,8 @@ namespace UI.Module
         }
 
         /// <summary>
-        /// Upgrade選択UIを表示するためのローカルメソッド。ネットワーク非同期モードではない場合や、クライアント側でClientRpcが呼び出されたときに使用される。
+        /// Upgrade選択UIを表示するためのローカルメソッド。
+        /// ネットワーク非同期モードではない場合や、クライアント側でClientRpcが呼び出されたときに使用される。
         /// </summary>
         void ShowUpgradeSelectionLocal(int[] definitionIndices, int[] currentLevels, int totalPlayerCount)
         {

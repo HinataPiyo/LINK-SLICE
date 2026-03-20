@@ -12,22 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4df408829b746664b946c5b705cf56a9, type: 3}
   m_Name: Stage1
   m_EditorClassIdentifier: 
-  entries:
-  - compositions:
-    - enemyType: 0
-      spawnPattern: 0
-      spawnCount: 3
-      spawnInterval: 1
-  - compositions:
-    - enemyType: 0
-      spawnPattern: 1
-      spawnCount: 2
-      spawnInterval: 2
-    - enemyType: 0
-      spawnPattern: 1
-      spawnCount: 2
-      spawnInterval: 2
-    - enemyType: 0
-      spawnPattern: 1
-      spawnCount: 2
-      spawnInterval: 2
+  entries: []
