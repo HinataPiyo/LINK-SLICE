@@ -1,5 +1,6 @@
 namespace PlayerSystem
 {
+    using PlayerSystem.Link;
     using Unity.Cinemachine;
     using Unity.Netcode;
     using UnityEngine;
@@ -43,15 +44,9 @@ namespace PlayerSystem
                 return;
             }
 
-            Movement[] players = FindObjectsByType<Movement>(FindObjectsSortMode.None);
-            foreach (Movement player in players)
+            if (LinkController.TryGetLocalOwnedPlayer(out Transform localPlayer))
             {
-                if (player == null || !player.IsSpawned || !player.IsOwner)
-                {
-                    continue;
-                }
-
-                cinemachineCamera.Follow = player.transform;
+                cinemachineCamera.Follow = localPlayer;
                 UpdateCameraTargetUi();
                 return;
             }

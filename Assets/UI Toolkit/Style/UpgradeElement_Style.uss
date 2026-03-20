@@ -45,3 +45,37 @@
     translate: 0 0;
     rotate: 2deg;
 }
+
+.button.locked {
+    scale: 1 1;
+    translate: 0 0;
+    rotate: 0deg;
+}
+
+.button.locked:hover {
+    transition-duration: 0s;
+    background-color: rgb(32, 22, 48);
+    scale: 1 1;
+    translate: 0 0;
+    rotate: 0deg;
+}
+
+.button.locked:active {
+    transition-duration: 0s;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    background-color: rgb(32, 22, 48);
+    scale: 1 1;
+    translate: 0 0;
+    rotate: 0deg;
+}

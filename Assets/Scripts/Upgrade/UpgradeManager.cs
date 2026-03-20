@@ -63,8 +63,10 @@ namespace Upgrade
             }
 
             IsUpgraded = true;    // 候補生成に成功したタイミングで待機フラグを立てる
-            expectedSelectionCount = GetExpectedSelectionCount();
+            expectedSelectionCount = GetExpectedSelectionCount();       // 現在のプレイヤー数をもとに、アップグレード選択の期待される投票数を取得する
             List<Entry> entries = new List<Entry>();
+
+            // 各候補の現在レベルやクリックされたときのアクションを設定して、Entryのリストを作成する。
             for (int i = 0; i < upgradeDefinitions.Length; i++)
             {
                 UpgradeState state = GetOrCreateState(upgradeDefinitions[i]);
@@ -81,7 +83,7 @@ namespace Upgrade
             selectedPlayerCounts = new int[currentEntries.Length];
 
             uiCtrl.ShowUpgradeSelection(currentEntries, expectedSelectionCount);   // UIを表示して、選出されたUpgradeの内容を渡す
-            uiCtrl.UpdateUpgradeSelectionCounts(selectedPlayerCounts, expectedSelectionCount);
+            uiCtrl.UpdateUpgradeSelectionCounts(selectedPlayerCounts, expectedSelectionCount);      // UIに選択状況を反映するためのClientRpcを呼び出す
         }
 
         /// <summary>
@@ -157,6 +159,8 @@ namespace Upgrade
         IEnumerator ResolveUpgradeSelectionRoutine()
         {
             List<int> selectedIndices = new List<int>();
+
+            // クライアントごとの選択を集計して、選択されたアップグレードのインデックスのリストを作成する。
             foreach (int selectedIndex in selectedUpgradeByClientId.Values)
             {
                 if (!selectedIndices.Contains(selectedIndex))
@@ -174,10 +178,13 @@ namespace Upgrade
 
             int randomIndex = UnityEngine.Random.Range(0, selectedIndices.Count);
             int selectedUpgradeIndex = selectedIndices[randomIndex];
+
+            // クライアントに選択されたUpgradeの結果を表示するためのClientRpcを呼び出す
             uiCtrl.ShowUpgradeSelectionResult(selectedUpgradeIndex);
 
             yield return new WaitForSeconds(selectedResultDisplaySeconds);
 
+            // 選択されたUpgradeを適用する
             ApplyUpgrade(currentEntries[selectedUpgradeIndex].data);
         }
 
@@ -301,6 +308,10 @@ namespace Upgrade
             return new UpgradeContext(coreHealth, linkRuntimeStats);
         }
 
+        /// <summary>
+        /// 現在のプレイヤー数をもとに、アップグレード選択の期待される投票数を取得する。
+        /// </summary>
+        /// <returns>アップグレード選択の期待される投票数</returns>
         int GetExpectedSelectionCount()
         {
             NetworkManager networkManager = NetworkManager.Singleton;

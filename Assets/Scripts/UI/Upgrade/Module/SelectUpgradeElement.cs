@@ -86,7 +86,7 @@ namespace UI.Module
                         if (hasSubmittedSelection) return;
 
                         hasSubmittedSelection = true;
-                        SetInteractable(false);
+                        LockSelection(selectedIndex);
                         onClick?.Invoke(selectedIndex);
                     });
                     upgradeElement.UpdateSelectedPlayerCount(0, totalPlayerCount);
@@ -98,6 +98,12 @@ namespace UI.Module
             }
         }
 
+        /// <summary>
+        /// クライアントにUpgrade選択UIの選択状況を更新するためのClientRpc。サーバーから呼び出される。
+         /// 各Upgradeが現在何人のプレイヤーに選択されているかを示す配列を受け取り、UIに選択状況を反映する。
+        /// </summary>
+        /// <param name="counts"> 各Upgradeが現在何人のプレイヤーに選択されているかを示す配列</param>
+        /// <param name="totalPlayerCount"> プレイヤーの総数。UIに選択状況を反映する際の分母として使用する。</param>
         public void UpdateSelectedPlayerCounts(int[] counts, int totalPlayerCount)
         {
             for (int i = 0; i < upgradeElements.Count; i++)
@@ -112,28 +118,46 @@ namespace UI.Module
             }
         }
 
+        /// <summary>
+        /// プレイヤーが選択したUpgradeの結果を表示するためのメソッド。選択されたUpgrade以外は非表示にする。
+        /// </summary>
+        /// <param name="selectedIndex">選択されたUpgradeのインデックス</param>
         public void ShowSelectedResult(int selectedIndex)
         {
             hasSubmittedSelection = true;
-            SetInteractable(false);
 
+            if (selectedIndex < 0 || selectedIndex >= upgradeElements.Count) return;
+
+            UpdateSelectionState(selectedIndex, hideUnselectedElements: true);
+        }
+
+        void LockSelection(int selectedIndex)
+        {
+            UpdateSelectionState(selectedIndex, hideUnselectedElements: false);
+        }
+
+        void UpdateSelectionState(int selectedIndex, bool hideUnselectedElements)
+        {
             for (int i = 0; i < upgradeElements.Count; i++)
             {
                 if (i == selectedIndex)
                 {
-                    upgradeElements[i].Show();
+                    upgradeElements[i].LockSelected();
+
+                    if (hideUnselectedElements)
+                    {
+                        upgradeElements[i].Show();
+                    }
+
                     continue;
                 }
 
-                upgradeElements[i].Hide();
-            }
-        }
+                upgradeElements[i].DisableForResult();
 
-        void SetInteractable(bool isInteractable)
-        {
-            for (int i = 0; i < upgradeElements.Count; i++)
-            {
-                upgradeElements[i].SetInteractable(isInteractable);
+                if (hideUnselectedElements)
+                {
+                    upgradeElements[i].Hide();
+                }
             }
         }
 
@@ -198,9 +222,48 @@ namespace UI.Module
                 selectedPlayerCount.text = $"選択中: {count}人";
             }
 
+            /// <summary>
+            /// UpgradeElementのインタラクティブ状態を設定するメソッド。
+            /// 選択肢が選択された後に、他の選択肢を非インタラクティブにするために使用する。
+            /// </summary>
+            /// <param name="isInteractable">インタラクティブ状態</param>
             public void SetInteractable(bool isInteractable)
             {
-                button?.SetEnabled(isInteractable);
+                if (button == null) return;
+
+                button.SetEnabled(isInteractable);
+                element.pickingMode = isInteractable ? PickingMode.Position : PickingMode.Ignore;
+                button.pickingMode = isInteractable ? PickingMode.Position : PickingMode.Ignore;
+
+                if (isInteractable)
+                {
+                    button.RemoveFromClassList("locked");
+                    return;
+                }
+
+                button.Blur();
+            }
+
+            public void DisableForResult()
+            {
+                if (button == null) return;
+
+                button.SetEnabled(false);
+                element.pickingMode = PickingMode.Ignore;
+                button.pickingMode = PickingMode.Ignore;
+                button.AddToClassList("locked");
+                button.Blur();
+            }
+
+            public void LockSelected()
+            {
+                if (button == null) return;
+
+                button.SetEnabled(true);
+                element.pickingMode = PickingMode.Ignore;
+                button.pickingMode = PickingMode.Ignore;
+                button.AddToClassList("locked");
+                button.Blur();
             }
 
             /// <summary>
