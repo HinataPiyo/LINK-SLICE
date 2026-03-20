@@ -5,12 +5,9 @@ namespace Core
 
     public class Health : HealthBase
     {
-        CoreController coreCtrl;
 
         protected override void Initialize()
         {
-            coreCtrl = GetComponent<CoreController>();
-            coreCtrl.CoreVisualUpdateClientRpc();
         }
 
         /// <summary>
@@ -23,8 +20,6 @@ namespace Core
             if (IsDead) return;
 
             currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
-
-            coreCtrl.CoreVisualUpdateClientRpc();     // ダメージを受けたときの処理を呼び出す
 
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合
             {

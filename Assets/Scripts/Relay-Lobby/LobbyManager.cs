@@ -168,6 +168,11 @@ public class LobbyManager : MonoBehaviour
 
     private void SyncUiState()
     {
+        if (eventHandler == null)
+        {
+            return;
+        }
+
         LobbyControlState controlState = LobbyUiStatePolicy.Build(
             isInitialized,
             isCreatingLobby,
@@ -289,7 +294,10 @@ public class LobbyManager : MonoBehaviour
                 Debug.Log($"Lobby:name {lobby.Name} id {lobby.Id} code {lobby.LobbyCode} maxPlayers {lobby.MaxPlayers}");
             }
 
-            eventHandler.Refresh(BuildDisplayLobbyList(queryResponse.Results));
+            if (eventHandler != null)
+            {
+                eventHandler.Refresh(BuildDisplayLobbyList(queryResponse.Results));
+            }
         }
         catch (LobbyServiceException e)
         {
@@ -573,7 +581,7 @@ public class LobbyManager : MonoBehaviour
     /// </summary>
     private void RefreshJoinedLobbyDisplay()
     {
-        if (joinedLobby == null)
+        if (joinedLobby == null || eventHandler == null)
         {
             return;
         }

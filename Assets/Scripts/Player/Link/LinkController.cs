@@ -5,13 +5,13 @@ namespace PlayerSystem.Link
     using UnityEngine;
     
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(LinkRuntimeStats))]
     public class LinkController : MonoBehaviour
     {
         static LinkController instance;
 
         [Header("生成設定")]
-        [SerializeField] Link linkPrefab;
-        [SerializeField] float targetDistance = 8f;     // ターゲットとの距離がこの値を超えたらリンクを切る
+        [SerializeField] PlayerConfig playerConfig;
         [SerializeField] Transform spawnParent;     // Linkを生成する親オブジェクト（未設定ならこのオブジェクトの子として生成）
 
         readonly Dictionary<long, LinkRuntime> linkRuntimes = new Dictionary<long, LinkRuntime>();
@@ -19,6 +19,8 @@ namespace PlayerSystem.Link
         readonly HashSet<long> activePairKeys = new HashSet<long>();
 
         float targetDistanceSqr;
+        float targetDistance;
+        LinkRuntimeStats runtimeStats;
 
         sealed class LinkRuntime
         {
@@ -39,8 +41,23 @@ namespace PlayerSystem.Link
             }
 
             instance = this;
+            runtimeStats = GetComponent<LinkRuntimeStats>();
+            if (runtimeStats == null)
+            {
+                // 既存シーンにコンポーネントがまだ付いていない場合でも動作できるように、実行時に補完する。
+                runtimeStats = gameObject.AddComponent<LinkRuntimeStats>();
+            }
+
+            runtimeStats.Initialize(playerConfig);
+            targetDistance = playerConfig.Link.distance;
             targetDistanceSqr = targetDistance * targetDistance;        // 0除算防止
         }
+
+        /// <summary>
+        /// アップグレード適用側が Link の共有攻撃力を更新するための入口。
+        /// LinkController は毎回の攻撃仲介はせず、共有ステータスの保持元としてだけ関与する。
+        /// </summary>
+        public LinkRuntimeStats RuntimeStats => runtimeStats;
 
         void Update()
         {
@@ -173,6 +190,9 @@ namespace PlayerSystem.Link
             UpdateLinkTransform(runtime);
         }
 
+        /// <summary>
+        /// リンクの見た目の更新と攻撃判定の更新を行う
+        /// </summary>
         void UpdateLinkTransform(LinkRuntime runtime)
         {
             if (runtime.spawnedLink == null || runtime.source == null || runtime.target == null) return;
@@ -181,6 +201,9 @@ namespace PlayerSystem.Link
             runtime.spawnedLink.SetTarget(runtime.target);
         }
 
+        /// <summary>
+        /// リンク切断中のLinkの見た目の更新を行う
+        /// </summary>
         void UpdateBreakingLinkTransform(LinkRuntime runtime)
         {
             if (runtime.spawnedLink == null || runtime.source == null) return;
@@ -233,7 +256,7 @@ namespace PlayerSystem.Link
         /// </summary>
         void SpawnLink(LinkRuntime runtime)
         {
-            if (linkPrefab == null)
+            if (playerConfig.Link.linkPrefab == null)
             {
                 Debug.LogWarning("Link prefabが未設定です", this);
                 return;
@@ -242,7 +265,8 @@ namespace PlayerSystem.Link
             if (runtime.spawnedLink != null || runtime.source == null || runtime.target == null) return;
 
             Transform parent = spawnParent != null ? spawnParent : transform;       // 親オブジェクトが指定されていない場合は管理オブジェクト配下に生成する
-            runtime.spawnedLink = Instantiate(linkPrefab, runtime.source.position, Quaternion.identity, parent);
+            runtime.spawnedLink = Instantiate(playerConfig.Link.linkPrefab, runtime.source.position, Quaternion.identity, parent);
+            runtime.spawnedLink.Initialize(runtimeStats);
             runtime.spawnedLink.SetTarget(runtime.target);
         }
 

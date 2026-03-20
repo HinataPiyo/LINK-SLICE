@@ -1,12 +1,13 @@
 namespace Enemy
 {
+    using Unity.Netcode;
     using UnityEngine;
     using Common;
-    using Unity.Netcode;
+    using UI;
+
 
     public class Health : HealthBase
     {
-
         protected override void Initialize()
         {
             
@@ -17,11 +18,25 @@ namespace Enemy
             if (!IsServer) return;
             if (IsDead) return;
 
-            currentHealth.Value = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
+            int health = Mathf.Max(CurrentHealth - damage, 0);     // ダメージを受けて体力を減らす（0未満にならないようにする）
+            ShowApplyDamageUIClientRpc(transform.position, damage);     // 各クライアントでローカルにダメージUIを生成して表示する
+            
+            currentHealth.Value = health;
             if(CurrentHealth <= 0f)       // 体力が0以下になった場合
             {
                 Die();      // 死亡処理
             }
+        }
+
+        [ClientRpc]
+        void ShowApplyDamageUIClientRpc(Vector3 position, int damage)
+        {
+            if (WorldCanvasManager.I == null)
+            {
+                return;
+            }
+
+            WorldCanvasManager.I.ShowApplyDamageUI(position, damage);
         }
         
         /// <summary>
@@ -33,7 +48,7 @@ namespace Enemy
             if (!IsServer) return;
 
             EnemySpawnController.I.RemoveEnemy(gameObject);     // EnemySpawnControllerから敵を削除
-            AudioManager.I.PlaySE("EnemyBreak");     // 敵の破壊音を再生
+            AudioManager.I.PlaySE("EnemyBreak");                // 敵の破壊音を再生
             base.Die();     // 基底クラスのDie()を呼び出して、死亡エフェクトを出す
         }
     }

@@ -16,18 +16,18 @@ MonoBehaviour:
   - compositions:
     - enemyType: 0
       spawnPattern: 0
-      spawnCount: 10
+      spawnCount: 3
       spawnInterval: 1
   - compositions:
     - enemyType: 0
       spawnPattern: 1
-      spawnCount: 3
-      spawnInterval: 1
+      spawnCount: 2
+      spawnInterval: 2
     - enemyType: 0
       spawnPattern: 1
-      spawnCount: 3
-      spawnInterval: 1.2
+      spawnCount: 2
+      spawnInterval: 2
     - enemyType: 0
       spawnPattern: 1
-      spawnCount: 3
-      spawnInterval: 1.5
+      spawnCount: 2
+      spawnInterval: 2

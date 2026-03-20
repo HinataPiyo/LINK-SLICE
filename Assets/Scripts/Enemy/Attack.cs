@@ -26,7 +26,6 @@ namespace Enemy
 
         void Update()
         {
-            if(!IsServer) return;                   // サーバーでなければ、以降の処理をスキップ
             if(!IsAtatcking) return;                // 攻撃していない場合は、以降の処理をスキップ
             if(damageableTarget == null) return;    // ダメージを与える対象がいない場合は、以降の処理をスキップ
 

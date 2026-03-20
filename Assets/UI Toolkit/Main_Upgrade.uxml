@@ -1,0 +1,15 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Temp_UpgradeElement" src="project://database/Assets/UI%20Toolkit/Temp_UpgradeElement.uxml?fileID=9197481963319205126&amp;guid=250e25e023a1e744e8bd28f935c26de2&amp;type=3#Temp_UpgradeElement" />
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:VisualElement name="SelectUpgradeElements" style="flex-direction: column; justify-content: space-around; width: 50%; top: 25%; left: 25%;">
+            <ui:VisualElement name="title-box" style="flex-grow: 1; top: -50px;">
+                <ui:Label text="強化する項目を選択してください" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/NotoSansJP-Medium.ttf?fileID=12800000&amp;guid=b5fecf1a33b7c4446a2b68c8b90542df&amp;type=3#NotoSansJP-Medium&quot;); font-size: 38px; -unity-text-align: middle-center; -unity-font-style: normal; color: rgb(255, 223, 73);" />
+            </ui:VisualElement>
+            <ui:VisualElement name="elements" style="flex-grow: 1; flex-direction: row; justify-content: space-around;">
+                <ui:Instance template="Temp_UpgradeElement" />
+                <ui:Instance template="Temp_UpgradeElement" />
+                <ui:Instance template="Temp_UpgradeElement" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3021b1302bfbcda45967b595b9ee35e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 2
 --- !u!114 &8401947634918144102
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,7 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxHealth: 1
+  defaultMaxHealth: 1
   dieEffectPrefab: {fileID: 907102635298086477, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
 --- !u!114 &2230776477293273044
 MonoBehaviour:

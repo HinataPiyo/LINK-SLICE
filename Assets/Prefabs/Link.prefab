@@ -4861,6 +4861,7 @@ GameObject:
   - component: {fileID: 7487675935115436982}
   - component: {fileID: 2980094787936113168}
   - component: {fileID: 2585206316543653826}
+  - component: {fileID: 1297175246348722331}
   m_Layer: 0
   m_Name: Link
   m_TagString: Untagged
@@ -5029,13 +5030,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  maxLineWidth: 0.15
-  growDuration: 0.2
-  shrinkDuration: 0.3
-  maxAnimationDeltaTime: 0.016666668
+  playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
+  attack: {fileID: 1297175246348722331}
 --- !u!114 &2585206316543653826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5082,3 +5078,16 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &1297175246348722331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6625668693239866367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48f4f0febab44fe478756e81d20d0db5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
