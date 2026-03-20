@@ -64,6 +64,10 @@ namespace Enemy
                                 yield return new WaitForSeconds(c.spawnInterval);     // 個々の敵の生成間隔を待機
                             }
                         }
+
+                        // グループ生成の場合は、Composition全体の生成後に待機する
+                        if(pattern == SpawnPositionPattern.Grouped)
+                            yield return new WaitForSeconds(c.spawnInterval);     // Composition全体の生成後の時間を待機
                     }
 
                     yield return new WaitUntil(() => ActiveEnemies.Count == 0);     // 生成された敵が全て倒されるまで待機
