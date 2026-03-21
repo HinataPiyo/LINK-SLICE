@@ -3,8 +3,8 @@ namespace Enemy
     using PlayerSystem;
     using UnityEngine;
     
-    public enum SpawnPositionPattern { Random, Grouped }
-    public enum EnemyType { Triangle_Melee, Triangle_LongRange }
+    public enum SpawnPositionPattern { Random, Grouped, Swarm }
+    public enum EnemyType { Triangle_Melee, Triangle_LongRange, MiniCircle_Melee }
 
     [CreateAssetMenu(fileName = "EnemySpawnConfig", menuName = "Config/EnemySpawnConfig")]
     public class EnemySpawnConfig : ScriptableObject
@@ -48,6 +48,9 @@ namespace Enemy
                 case SpawnPositionPattern.Grouped:
                     Vector2 group = new Vector2(Random.Range(centerPos.x - 2f, centerPos.x + 2f), Random.Range(centerPos.y - 2f, centerPos.y + 2f));    // グループ化された位置
                     return group; // グループ化された位置（例: 中央）
+                case SpawnPositionPattern.Swarm:
+                    Vector2 swarm = centerPos + Vector2.down;
+                    return swarm;
                 default:
                     return Vector2.zero;
             }

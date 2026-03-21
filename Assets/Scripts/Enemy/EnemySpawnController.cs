@@ -2,6 +2,7 @@ namespace Enemy
 {
     using System.Collections;
     using System.Collections.Generic;
+    using Enemy.SpawnType;
     using Unity.Netcode;
     using UnityEngine;
     using Upgrade;
@@ -13,10 +14,19 @@ namespace Enemy
         [SerializeField] EnemySpawnConfig[] spawnConfigs;
         [SerializeField] float timeAfterWave = 3f;
         public List<GameObject> ActiveEnemies { get; private set; } = new List<GameObject>();     // 現在アクティブな敵のリスト
+        const float SwarmSpacing = 0.6f;
+        Dictionary<SpawnPositionPattern, IEnemySpawnPattern> spawnPatterns;
 
         void Awake()
         {
             if (I == null) I = this;
+
+            spawnPatterns = new Dictionary<SpawnPositionPattern, IEnemySpawnPattern>
+            {
+                { SpawnPositionPattern.Random, new RandomSpawnPattern() },
+                { SpawnPositionPattern.Grouped, new GroupedSpawnPattern() },
+                { SpawnPositionPattern.Swarm, new SwarmSpawnPattern() },
+            };
         }
 
         void Start()
@@ -40,34 +50,15 @@ namespace Enemy
                 {
                     foreach (EnemyWaveEntry.Composition c in entries.compositions)
                     {
-                        SpawnPositionPattern pattern = c.spawnPattern;
-                        Vector3? compositionAnchor = null;  // グループ生成の基準位置を保持する変数
-
-                        for (int i = 0; i < c.spawnCount; i++)
+                        if (!spawnPatterns.TryGetValue(c.spawnPattern, out IEnemySpawnPattern spawnPattern))
                         {
-                            bool isFirstInComposition = i == 0;
-
-                            // 敵の生成パターンがグループだった場合
-                            if (pattern == SpawnPositionPattern.Grouped)
-                            {
-                                GameObject spawnedEnemy = Spawn(c.enemyType, pattern, isFirstInComposition, compositionAnchor);
-                                if (isFirstInComposition)
-                                {
-                                    compositionAnchor = spawnedEnemy.transform.position;
-                                }
-
-                                yield return null;
-                            }
-                            else if (pattern == SpawnPositionPattern.Random)     // 敵の生成パターンがランダムだった場合
-                            {
-                                Spawn(c.enemyType, pattern, isFirstInComposition, compositionAnchor);
-                                yield return new WaitForSeconds(c.spawnInterval);     // 個々の敵の生成間隔を待機
-                            }
+                            Debug.LogError($"Spawn pattern {c.spawnPattern} is not registered.");
+                            continue;
                         }
 
-                        // グループ生成の場合は、Composition全体の生成後に待機する
-                        if(pattern == SpawnPositionPattern.Grouped)
-                            yield return new WaitForSeconds(c.spawnInterval);     // Composition全体の生成後の時間を待機
+                        // パターンごとのstateを格納するContextを生成
+                        var context = new SpawnPatternContext();
+                        yield return spawnPattern.SpawnComposition(this, c, context);
                     }
 
                     yield return new WaitUntil(() => ActiveEnemies.Count == 0);     // 生成された敵が全て倒されるまで待機
@@ -83,22 +74,8 @@ namespace Enemy
         /// <summary>
         /// 敵の生成処理
         /// </summary>
-        GameObject Spawn(EnemyType enemy, SpawnPositionPattern pattern, bool isFirstInComposition, Vector3? compositionAnchor)
+        public GameObject SpawnEnemy(EnemyType enemy, Vector3 spawnPos)
         {
-            Vector3 spawnPos;
-            if (isFirstInComposition)        // 各Compositionの最初の敵はランダムな位置に生成
-            {
-                spawnPos = EnemySpawnConfig.GetSpawnPosition(SpawnPositionPattern.Random);
-            }
-            else if (pattern == SpawnPositionPattern.Grouped && compositionAnchor.HasValue)
-            {
-                spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern, compositionAnchor.Value); // Composition先頭を基準にグループ生成
-            }
-            else
-            {
-                spawnPos = EnemySpawnConfig.GetSpawnPosition(pattern);       // 生成位置の取得
-            }
-
             GameObject spawnedEnemy = Instantiate(enemyContainer.GetEnemyPrefab(enemy), spawnPos, Quaternion.identity);
 
             NetworkObject networkObject = spawnedEnemy.GetComponent<NetworkObject>();
@@ -109,6 +86,45 @@ namespace Enemy
 
             ActiveEnemies.Add(spawnedEnemy);
             return spawnedEnemy;
+        }
+
+        public Vector3 GetRandomSpawnPosition()
+        {
+            return EnemySpawnConfig.GetSpawnPosition(SpawnPositionPattern.Random);
+        }
+
+        public Vector3 GetGroupedSpawnPosition(Vector3 compositionAnchor)
+        {
+            return EnemySpawnConfig.GetSpawnPosition(SpawnPositionPattern.Grouped, compositionAnchor);
+        }
+
+        public Vector3 GetSwarmSpawnPosition(Transform swarmFollowTarget)
+        {
+            if (swarmFollowTarget == null)
+            {
+                return GetRandomSpawnPosition();
+            }
+
+            Vector2 followPosition = swarmFollowTarget.position;
+            Vector2 awayFromCore = followPosition.sqrMagnitude > 0.0001f ? followPosition.normalized : Vector2.up;
+            return followPosition + awayFromCore * SwarmSpacing;
+        }
+
+        public void ConfigureSwarmMovement(GameObject spawnedEnemy, Transform previousSwarmMember, bool isFirstInComposition)
+        {
+            Movement movement = spawnedEnemy.GetComponent<Movement>();
+            if (movement == null)
+            {
+                return;
+            }
+
+            if (isFirstInComposition)
+            {
+                movement.SetupSwarmLeader();
+                return;
+            }
+
+            movement.SetupSwarmFollower(previousSwarmMember, SwarmSpacing);
         }
 
         /// <summary>

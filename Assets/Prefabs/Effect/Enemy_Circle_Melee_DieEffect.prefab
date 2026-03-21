@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &2606217595162888103
+--- !u!1001 &8798700619632630461
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -11,11 +11,15 @@ PrefabInstance:
     - target: {fileID: 907102635298086477, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: setMaterial
       value: 
-      objectReference: {fileID: 2100000, guid: 5b5ee893d6dda7c459881462be63ea98, type: 2}
+      objectReference: {fileID: 2100000, guid: 576fb78f0da8065448bc01ee38119a3b, type: 2}
     - target: {fileID: 1040722651145013052, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 5b5ee893d6dda7c459881462be63ea98, type: 2}
+      objectReference: {fileID: 2100000, guid: 576fb78f0da8065448bc01ee38119a3b, type: 2}
+    - target: {fileID: 1107344977812671825, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 1840364896727108822, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -58,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7679234725115218961, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: m_Name
-      value: Enemy_Triangle_LongRange_DieEffect
+      value: Enemy_Circle_Melee_DieEffect
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

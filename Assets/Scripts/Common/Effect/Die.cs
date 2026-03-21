@@ -5,13 +5,6 @@ namespace Common.Effect
     public class Die : MonoBehaviour
     {
         [SerializeField] ParticleSystem ps;
-        [SerializeField] Material setMaterial;
-
-        void Awake()
-        {
-            ParticleSystemRenderer renderer = ps.GetComponent<ParticleSystemRenderer>();
-            renderer.material = setMaterial;
-        }
 
         void Update()
         {
