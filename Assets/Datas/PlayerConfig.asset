@@ -21,7 +21,7 @@ MonoBehaviour:
     attackIntarval: 0.5
     targetLayer:
       serializedVersion: 2
-      m_Bits: 64
+      m_Bits: 576
     maxLineWidth: 0.15
     growDuration: 0.2
     shrinkDuration: 0.12

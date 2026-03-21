@@ -213,6 +213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
+  defaultSwarmFollowDistance: 0.6
 --- !u!114 &8401947634918144102
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,9 +227,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rayDistance: 1
+  rangeRadius: 3
   targetLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  rangeLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &5384288776415118917
 MonoBehaviour:
   m_ObjectHideFlags: 0

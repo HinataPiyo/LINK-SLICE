@@ -14,7 +14,7 @@ TagManager:
   - Enemy
   - Core
   - Invisible
-  - 
+  - Armor
   - 
   - 
   - 
@@ -40,6 +40,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: WorldCanvas_Front
+    uniqueID: 3996232395
     locked: 0
   m_RenderingLayers:
   - Default

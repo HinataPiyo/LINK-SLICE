@@ -4,6 +4,7 @@ namespace Common
     using Common.Effect;
     using UnityEngine;
     using Unity.Netcode;
+    using UI;
 
 
     public abstract class HealthBase : NetworkBehaviour, IDamageable
@@ -218,6 +219,18 @@ namespace Common
         {
             if (dieEffectPrefab == null) return;
             Instantiate(dieEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        
+        [ClientRpc]
+        protected void ShowApplyDamageUIClientRpc(Vector3 position, int damage)
+        {
+            if (WorldCanvasManager.I == null)
+            {
+                return;
+            }
+
+            WorldCanvasManager.I.ShowApplyDamageUI(position, damage);
         }
     }
 }
