@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: CoreHealthUp
   m_EditorClassIdentifier: 
   upgradeName: "\u30B3\u30A2\u4F53\u529B\u5897\u5F37"
-  description: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 155a1810cfd4e244e818aecbda99cb31, type: 3}
+  maxLevel: 10
   healthIncreasePercent: 1

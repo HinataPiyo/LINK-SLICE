@@ -1,5 +1,5 @@
 .button {
-    background-color: rgb(32, 22, 48);
+    background-color: rgb(6, 2, 50);
     border-left-color: rgb(255, 255, 255);
     border-right-color: rgb(255, 255, 255);
     border-top-color: rgb(255, 255, 255);
@@ -13,22 +13,22 @@
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     transition-duration: 0.5s;
-    transition-timing-function: ease-out-back;
+    transition-timing-function: ease-out-bounce;
+    max-width: 280px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    align-self: center;
 }
 
 .button:hover {
-    transition-duration: 0.2s;
-    transition-timing-function: ease-out-back;
-    background-color: rgb(95, 44, 55);
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out-bounce;
+    background-color: rgb(151, 39, 63);
     scale: 1.1 1.1;
-    translate: 0 -20px;
+    translate: 0 -50px;
     rotate: -1deg;
-}
-
-.button:active {
-    transition-duration: 0.2s;
-    transition-timing-function: ease-out;
-    scale: 0.98 0.98;
     border-top-width: 5px;
     border-right-width: 5px;
     border-bottom-width: 5px;
@@ -37,45 +37,13 @@
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
-    border-left-color: rgb(29, 10, 55);
-    border-right-color: rgb(29, 10, 55);
-    border-top-color: rgb(29, 10, 55);
-    border-bottom-color: rgb(29, 10, 55);
-    background-color: rgb(48, 30, 85);
+}
+
+.button:active {
+    transition-duration: 0.1s;
+    transition-timing-function: ease;
+    scale: 0.98 0.98;
+    background-color: rgb(30, 36, 85);
     translate: 0 0;
     rotate: 2deg;
-}
-
-.button.locked {
-    scale: 1 1;
-    translate: 0 0;
-    rotate: 0deg;
-}
-
-.button.locked:hover {
-    transition-duration: 0s;
-    background-color: rgb(32, 22, 48);
-    scale: 1 1;
-    translate: 0 0;
-    rotate: 0deg;
-}
-
-.button.locked:active {
-    transition-duration: 0s;
-    border-top-width: 3px;
-    border-right-width: 3px;
-    border-bottom-width: 3px;
-    border-left-width: 3px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    border-left-color: rgb(255, 255, 255);
-    border-right-color: rgb(255, 255, 255);
-    border-top-color: rgb(255, 255, 255);
-    border-bottom-color: rgb(255, 255, 255);
-    background-color: rgb(32, 22, 48);
-    scale: 1 1;
-    translate: 0 0;
-    rotate: 0deg;
 }

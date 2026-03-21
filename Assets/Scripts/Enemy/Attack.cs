@@ -19,8 +19,12 @@ namespace Enemy
         /// <param name="target">ダメージを与える対象のゲームオブジェクト</param>
         public void ChangeAttackFlag(bool isAttacking, GameObject target)
         {
-            damageableTarget = target.GetComponent<IDamageable>();   // ターゲットからIDamageableコンポーネントを取得
-            Reset();
+            if(target != null)
+            {
+                damageableTarget = target.GetComponent<IDamageable>();   // ターゲットからIDamageableコンポーネントを取得
+                Reset();
+            }
+            
             IsAtatcking = isAttacking;
         }
 

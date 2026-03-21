@@ -1752,6 +1752,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
   spawnParent: {fileID: 0}
+  collectExistingPlayersForDebug: 1
 --- !u!114 &1003155410
 MonoBehaviour:
   m_ObjectHideFlags: 0
