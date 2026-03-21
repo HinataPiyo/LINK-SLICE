@@ -50,6 +50,18 @@ namespace PlayerSystem
             // フォールバックを残すことで、注入漏れ時にも最低限従来挙動を維持する。
             int damage = runtimeStats != null ? runtimeStats.CurrentStrength : playerConfig.Link.strength;
             float interval = runtimeStats != null ? runtimeStats.CurrentInterval : playerConfig.Link.attackIntarval;
+
+            // 最初の攻撃はクールダウンを無視して即時実行
+            if (!processedTargetIds.Contains(targetId))
+            {
+                processedTargetIds.Add(targetId);
+                damageableTarget.ApplyDamage(damage);
+                // クールダウンを待たずに即終了
+                attackCooldownRoutines.Remove(targetId);
+                yield break;
+            }
+
+            // 2回目以降はクールダウンを待つ
             damageableTarget.ApplyDamage(damage);
             yield return new WaitForSeconds(interval);
             attackCooldownRoutines.Remove(targetId);
