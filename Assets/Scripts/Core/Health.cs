@@ -5,9 +5,11 @@ namespace Core
 
     public class Health : HealthBase
     {
+        [SerializeField] PlayerConfig playerConfig;
 
-        protected override void Initialize()
+        void Awake()
         {
+            Initialize(playerConfig.Core.maxHealth, playerConfig.Core.dieEffectPrefab);
         }
 
         /// <summary>

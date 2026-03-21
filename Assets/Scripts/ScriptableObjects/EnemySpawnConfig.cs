@@ -4,7 +4,7 @@ namespace Enemy
     using UnityEngine;
     
     public enum SpawnPositionPattern { Random, Grouped, Swarm }
-    public enum EnemyType { Triangle_Melee, Triangle_LongRange, MiniCircle_Melee }
+    public enum EnemyType { Triangle_Melee, Triangle_LongRange, MiniCircle_Melee, Rhombus_Phase, Square_MeleeArmor }
 
     [CreateAssetMenu(fileName = "EnemySpawnConfig", menuName = "Config/EnemySpawnConfig")]
     public class EnemySpawnConfig : ScriptableObject

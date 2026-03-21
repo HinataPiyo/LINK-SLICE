@@ -557,7 +557,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1712939256010682450, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393498214897682015, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_Enabled
@@ -731,17 +731,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!223 &594580952
 Canvas:
   m_ObjectHideFlags: 0
@@ -754,15 +754,15 @@ Canvas:
   m_RenderMode: 1
   m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: -298734901
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &594580953
@@ -821,7 +821,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 00000000cbaa31ee
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -916,6 +916,7 @@ MonoBehaviour:
   spawnConfigs:
   - {fileID: 11400000, guid: bdab0a8dde439ec4d8aabbc2ff4bc91a, type: 2}
   - {fileID: 11400000, guid: d981bad5595de694f847daf5369d0f7d, type: 2}
+  - {fileID: 11400000, guid: 991a304b0aa56014681751bed2e87bef, type: 2}
   timeAfterWave: 3
 --- !u!1 &666217345
 GameObject:
@@ -1277,8 +1278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  defaultMaxHealth: 10
-  dieEffectPrefab: {fileID: 907102635298086477, guid: 4d9e012641a72bf40bfd7241c060576b, type: 3}
+  playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
 --- !u!1001 &858830613
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1293,7 +1293,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1712939256010682450, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393498214897682015, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_Enabled
@@ -2183,7 +2183,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1712939256010682450, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393498214897682015, guid: cc4964b671f70454395be34e12354673, type: 3}
       propertyPath: m_Enabled

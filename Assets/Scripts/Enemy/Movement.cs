@@ -4,9 +4,9 @@ namespace Enemy
     
     public class Movement : MonoBehaviour
     {
-        [SerializeField] float moveSpeed = 3f;
-        [SerializeField] float defaultSwarmFollowDistance = 0.6f;
+        [SerializeField] EnemyDefinition enemyData;
 
+        float moveSpeed = 3f;
         Transform swarmFollowTarget;
         float swarmFollowDistance;
         
@@ -15,7 +15,7 @@ namespace Enemy
         public void SetupSwarmLeader()
         {
             swarmFollowTarget = null;
-            swarmFollowDistance = defaultSwarmFollowDistance;
+            swarmFollowDistance = enemyData.defaultSwarmFollowDistance;
         }
 
         public void SetupSwarmFollower(Transform followTarget, float followDistance)

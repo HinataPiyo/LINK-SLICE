@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ab87527d9f5b3140b15eec3b98cd809, type: 3}
+  m_Name: EnemyData_Armor
+  m_EditorClassIdentifier: 
+  enemyType: 4
+  dieEffectPrefab: {fileID: 7218091992294400919, guid: 143faa276c63f5848bec0664dfa77da0, type: 3}
+  strength: 5
+  attackRate: 1.5
+  maxHealth: 5
+  moveSpeed: 1
+  rangeRadius: 0
+  rangeLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  rayDistance: 1
+  rayLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  defaultSwarmFollowDistance: 0.6
+  armorHealth: 3
+  armorDieEffectPrefab: {fileID: 7218091992294400919, guid: cb315ec00a15f114bab2341fc4322a75, type: 3}

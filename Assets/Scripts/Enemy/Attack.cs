@@ -5,8 +5,7 @@ namespace Enemy
     
     public abstract class Attack : NetworkBehaviour 
     {
-        [SerializeField] protected int strength = 1;     // 攻撃の強さ
-        [SerializeField] float attackRate = 1f;     // 攻撃の頻度（1秒あたりの攻撃回数）
+        [SerializeField] protected EnemyDefinition enemyData;
         float elapsedTime = 0f;                      // 経過時間
         IDamageable damageableTarget;                      // ダメージを与える対象
 
@@ -30,17 +29,20 @@ namespace Enemy
 
         void Update()
         {
+            UpdateOverridden();
+            
             if(!IsAtatcking) return;                // 攻撃していない場合は、以降の処理をスキップ
             if(damageableTarget == null) return;    // ダメージを与える対象がいない場合は、以降の処理をスキップ
 
             elapsedTime += Time.deltaTime;          // 経過時間を更新
-            if(elapsedTime >= attackRate)           // 攻撃の頻度に達した場合
+            if(elapsedTime >= enemyData.attackRate)           // 攻撃の頻度に達した場合
             {
                 OnAction(damageableTarget);         // ターゲットに攻撃を行う
                 Reset();
             }
         }
 
+        protected virtual void UpdateOverridden() { }    // 派生クラスで必要に応じてUpdateをオーバーライドできるようにする
         public abstract void OnAction(IDamageable target);    // 攻撃のアクションを定義する抽象メソッド
 
         /// <summary>

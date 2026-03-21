@@ -1,24 +1,24 @@
 namespace Common
 {
     using System.Collections.Generic;
-    using Common.Effect;
     using UnityEngine;
     using Unity.Netcode;
-
+    using UI;
+    using Common.Effect;
 
     public abstract class HealthBase : NetworkBehaviour, IDamageable
     {
-        [SerializeField] protected int defaultMaxHealth = 1;
-        [SerializeField] Die dieEffectPrefab;
         protected NetworkVariable<int> currentHealth = new NetworkVariable<int>();
         protected NetworkVariable<int> maxHealth = new NetworkVariable<int>();
         readonly Dictionary<string, int> maxHealthFlatModifiers = new Dictionary<string, int>();
         readonly Dictionary<string, float> maxHealthPercentModifiers = new Dictionary<string, float>();
         public event System.Action HealthStateChanged;
+        protected int defaultMaxHealth;
+        Die dieEffectPrefab;
 
         public int MaxHealth
         {
-            get => IsSpawned ? maxHealth.Value : defaultMaxHealth;
+            get => IsSpawned ? maxHealth.Value : 1;
             protected set => maxHealth.Value = value;
         }
         public Vector2 GetPosition()
@@ -32,11 +32,6 @@ namespace Common
         public int CurrentHealth => IsSpawned ? currentHealth.Value : MaxHealth;
         public bool IsDead { get; private set; } = false;
 
-
-        void Start()
-        {
-            Initialize();
-        }
 
         public override void OnNetworkSpawn()
         {
@@ -72,7 +67,11 @@ namespace Common
         /// Awake で呼び出される初期化処理。
         /// HealthBase では特に何も行わないが、派生クラスで必要に応じてオーバーライドして使用する。
         /// </summary>
-        protected abstract void Initialize();
+        protected void Initialize(int initialMaxHealth, Die dieEffectPrefab)
+        {
+            defaultMaxHealth = initialMaxHealth;
+            this.dieEffectPrefab = dieEffectPrefab;
+        }
 
         /// <summary>
         /// IDamageable インターフェースの TakeDamage メソッドの実装。
@@ -218,6 +217,18 @@ namespace Common
         {
             if (dieEffectPrefab == null) return;
             Instantiate(dieEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        
+        [ClientRpc]
+        protected void ShowApplyDamageUIClientRpc(Vector3 position, int damage)
+        {
+            if (WorldCanvasManager.I == null)
+            {
+                return;
+            }
+
+            WorldCanvasManager.I.ShowApplyDamageUI(position, damage);
         }
     }
 }
