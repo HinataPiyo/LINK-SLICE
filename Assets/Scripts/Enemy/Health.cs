@@ -9,9 +9,12 @@ namespace Enemy
 
     public class Health : HealthBase
     {
+        [SerializeField] EnemyDefinition enemyData;
         Stack<Armor> armors = new Stack<Armor>();     // 装甲を格納するスタック。装甲は階層順にスタックされる（子オブジェクトの順番）
-        protected override void Initialize()
+
+        void Awake()
         {
+            Initialize(enemyData.maxHealth, enemyData.dieEffectPrefab);
             ArmorInitialize();
         }
 

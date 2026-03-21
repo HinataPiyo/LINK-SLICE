@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3007919196254300920, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_Radius
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 3218074460964751067, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 336149689
@@ -69,6 +73,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 503220b87ed56e744989d8c8c5ea50ab, type: 2}
     - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 84f02e74b121e3041a63a4ca2c7b998f, type: 2}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: dieEffectPrefab
       value: 
       objectReference: {fileID: 4707742459236616872, guid: f1a0bc9fbbfb6934585edc984db337fd, type: 3}
@@ -100,10 +108,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 8198151508004392855, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 84f02e74b121e3041a63a4ca2c7b998f, type: 2}
     - target: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: m_Name
       value: Enemy_Rhombus_Phase
       objectReference: {fileID: 0}
+    - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 84f02e74b121e3041a63a4ca2c7b998f, type: 2}
     - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: rangeRadius
       value: 2
@@ -138,7 +154,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  strength: 1
-  attackRate: 1
-  moveSpeedInPhase: 1
-  moveSpeedOutPhase: 3
+  enemyData: {fileID: 11400000, guid: 84f02e74b121e3041a63a4ca2c7b998f, type: 2}
+  phaseData: {fileID: 11400000, guid: 84f02e74b121e3041a63a4ca2c7b998f, type: 2}

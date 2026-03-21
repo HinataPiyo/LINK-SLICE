@@ -916,6 +916,7 @@ MonoBehaviour:
   spawnConfigs:
   - {fileID: 11400000, guid: bdab0a8dde439ec4d8aabbc2ff4bc91a, type: 2}
   - {fileID: 11400000, guid: d981bad5595de694f847daf5369d0f7d, type: 2}
+  - {fileID: 11400000, guid: 991a304b0aa56014681751bed2e87bef, type: 2}
   timeAfterWave: 3
 --- !u!1 &666217345
 GameObject:
@@ -1277,8 +1278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  defaultMaxHealth: 10
-  dieEffectPrefab: {fileID: 907102635298086477, guid: 4d9e012641a72bf40bfd7241c060576b, type: 3}
+  playerConfig: {fileID: 11400000, guid: fdc59cfca8986d241a5af808c29890ec, type: 2}
 --- !u!1001 &858830613
 PrefabInstance:
   m_ObjectHideFlags: 0

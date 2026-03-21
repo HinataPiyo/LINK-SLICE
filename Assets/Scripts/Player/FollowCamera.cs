@@ -73,7 +73,7 @@ namespace PlayerSystem
                 ? cinemachineCamera.Follow.name
                 : "未設定";
 
-            TestUIManager.I.SetCameraTargetInformation($"CameraTarget: {targetName}");
+            // TestUIManager.I.SetCameraTargetInformation($"CameraTarget: {targetName}");
         }
     }
 }

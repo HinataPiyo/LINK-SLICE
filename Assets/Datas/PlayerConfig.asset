@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core:
     maxHealth: 100
+    dieEffectPrefab: {fileID: 907102635298086477, guid: 4d9e012641a72bf40bfd7241c060576b, type: 3}
   link:
     linkPrefab: {fileID: 2980094787936113168, guid: 94b7995099527794b9e467f40c969a26, type: 3}
     strength: 1

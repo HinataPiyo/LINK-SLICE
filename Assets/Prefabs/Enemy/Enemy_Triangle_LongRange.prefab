@@ -57,6 +57,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 5b5ee893d6dda7c459881462be63ea98, type: 2}
     - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 3ea043bc231bd2544b165a02813dc494, type: 2}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: dieEffectPrefab
       value: 
       objectReference: {fileID: 2935652144093452778, guid: f5ee5da683e3417498f37f2cc5078701, type: 3}
@@ -64,10 +68,18 @@ PrefabInstance:
       propertyPath: defaultMaxHealth
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 8198151508004392855, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 3ea043bc231bd2544b165a02813dc494, type: 2}
     - target: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: m_Name
       value: Enemy_Triangle_LongRange
       objectReference: {fileID: 0}
+    - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 3ea043bc231bd2544b165a02813dc494, type: 2}
     - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: rayDistance
       value: 5
@@ -98,7 +110,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  strength: 1
-  attackRate: 1
-  bulletPrefab: {fileID: 3756038325925356280, guid: 0570c48658972e04496d619f2fa7b5ae, type: 3}
-  bulletSpeed: 15
+  enemyData: {fileID: 11400000, guid: 3ea043bc231bd2544b165a02813dc494, type: 2}
+  longRangeData: {fileID: 11400000, guid: 3ea043bc231bd2544b165a02813dc494, type: 2}

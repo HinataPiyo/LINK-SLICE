@@ -53,6 +53,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 601da012baf158d41b4d70223991f995, type: 2}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: dieEffectPrefab
       value: 
       objectReference: {fileID: 7603076137326904715, guid: e2cfcbe099ec4a144b48f689229a8d4b, type: 3}
@@ -60,10 +64,18 @@ PrefabInstance:
       propertyPath: defaultMaxHealth
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8198151508004392855, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 601da012baf158d41b4d70223991f995, type: 2}
     - target: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: m_Name
       value: Enemy_Triangle_Melee
       objectReference: {fileID: 0}
+    - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 601da012baf158d41b4d70223991f995, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -90,5 +102,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  strength: 1
-  attackRate: 1
+  enemyData: {fileID: 11400000, guid: 601da012baf158d41b4d70223991f995, type: 2}

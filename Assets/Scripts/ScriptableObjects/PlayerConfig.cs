@@ -1,5 +1,6 @@
 using PlayerSystem.Link;
 using UnityEngine;
+using Common.Effect;
 
 [CreateAssetMenu(fileName = "PlayerConfig", menuName = "PlayerConfig", order = 0)]
 public class PlayerConfig : ScriptableObject
@@ -17,6 +18,7 @@ public class PlayerConfig : ScriptableObject
     public class CoreEntry
     {
         public int maxHealth = 100;
+        public Die dieEffectPrefab;
     }
 
     [System.Serializable]

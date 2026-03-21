@@ -138,8 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  defaultMaxHealth: 5
-  dieEffectPrefab: {fileID: 7218091992294400919, guid: cb315ec00a15f114bab2341fc4322a75, type: 3}
+  armorData: {fileID: 11400000, guid: 352a96c17536e2a48ae04881d56043ad, type: 2}
 --- !u!1001 &3903985632485369003
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -205,6 +204,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 87bad40579059a14eb35591a1a5e312e, type: 2}
     - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 352a96c17536e2a48ae04881d56043ad, type: 2}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: dieEffectPrefab
       value: 
       objectReference: {fileID: 7218091992294400919, guid: 143faa276c63f5848bec0664dfa77da0, type: 3}
@@ -217,6 +220,10 @@ PrefabInstance:
       value: Main_Square
       objectReference: {fileID: 0}
     - target: {fileID: 8198151508004392855, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 352a96c17536e2a48ae04881d56043ad, type: 2}
+    - target: {fileID: 8198151508004392855, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
       propertyPath: moveSpeed
       value: 1
       objectReference: {fileID: 0}
@@ -224,6 +231,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy_Square_Melee_Armor
       objectReference: {fileID: 0}
+    - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 352a96c17536e2a48ae04881d56043ad, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -253,8 +264,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  strength: 5
-  attackRate: 1.5
+  enemyData: {fileID: 11400000, guid: 352a96c17536e2a48ae04881d56043ad, type: 2}
 --- !u!4 &6501850615903847897 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7788562759638999410, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}

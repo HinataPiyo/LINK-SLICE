@@ -3,9 +3,9 @@ using Unity.Netcode;
 
 public class Bullet : NetworkBehaviour
 {
-    [SerializeField] LayerMask targetLayer;
     int damage;
     float speed;
+    LayerMask targetLayer;
     Vector3 direction;
     Rigidbody2D rb;
 
@@ -14,11 +14,12 @@ public class Bullet : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public void Initialize(Vector3 direction, float speed, int damage)
+    public void Initialize(Vector3 direction, float speed, int damage, LayerMask targetLayer)
     {
         this.direction = direction;
         this.speed = speed;
         this.damage = damage;
+        this.targetLayer = targetLayer;
     }
 
     void FixedUpdate()

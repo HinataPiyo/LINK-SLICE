@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1ab66913442a39438a893edb7e68ddc, type: 3}
+  m_Name: EnemyData_LongRange
+  m_EditorClassIdentifier: 
+  enemyType: 1
+  dieEffectPrefab: {fileID: 2935652144093452778, guid: f5ee5da683e3417498f37f2cc5078701, type: 3}
+  strength: 1
+  attackRate: 1
+  maxHealth: 3
+  moveSpeed: 1.5
+  rangeRadius: 0
+  rangeLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  rayDistance: 5
+  rayLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  defaultSwarmFollowDistance: 0.6
+  bulletSpeed: 15
+  bulletPrefab: {fileID: 3756038325925356280, guid: 0570c48658972e04496d619f2fa7b5ae, type: 3}

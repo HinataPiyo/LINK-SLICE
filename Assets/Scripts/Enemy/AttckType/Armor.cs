@@ -9,12 +9,18 @@ namespace Enemy
     /// </summary>
     public class Armor : HealthBase
     {
+        [SerializeField] ArmorEnemyData armorData;
         bool isDamageable = true;     // ダメージを受けることができるかどうかのフラグ
         System.Action onRemoved;     // 装甲が破壊されたときに呼び出されるコールバック
         
 
         public void SetDamageable(bool value) => isDamageable = value;
-        protected override void Initialize() { }
+
+        void Awake()
+        {
+            // 基底クラスのInitializeを呼び出して、体力と死亡エフェクトをセット
+            Initialize(armorData.armorHealth, armorData.armorDieEffectPrefab);
+        }
 
         public void RequireRemove(System.Action onRemoved)
         {

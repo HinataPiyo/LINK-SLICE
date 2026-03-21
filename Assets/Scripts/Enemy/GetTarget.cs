@@ -4,11 +4,7 @@ namespace Enemy
     
     public class GetTarget : MonoBehaviour
     {
-        // 進んでる方向にRayを飛ばし接触したTargetを取得する
-        [SerializeField] float rayDistance = 1f;        // Rayの距離
-        [SerializeField] float rangeRadius = 3f;       // ターゲットを取得する範囲の半径
-        [SerializeField] LayerMask targetLayerMask;     // ターゲットのレイヤーマスク
-        [SerializeField] LayerMask rangeLayerMask;      // ターゲットを取得する範囲のレイヤーマスク
+        [SerializeField] EnemyDefinition enemyData;
 
         /// <summary>
         /// ターゲット取得する
@@ -16,9 +12,9 @@ namespace Enemy
         public GameObject GetTargetObject()
         {
             Vector2 direction = Vector2.zero - (Vector2)transform.position;     // 原点の方を向くベクトル
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction.normalized, rayDistance, targetLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction.normalized, enemyData.rayDistance, enemyData.rayLayerMask);
             bool isHit = hit.collider != null;     // Rayが何かに当たったかどうかのフラグ
-            Debug.DrawRay(transform.position, direction.normalized * rayDistance, isHit ? Color.red : Color.green);    // Rayを可視化（当たった場合は赤、当たらなかった場合は緑）
+            Debug.DrawRay(transform.position, direction.normalized * enemyData.rayDistance, isHit ? Color.red : Color.green);    // Rayを可視化（当たった場合は赤、当たらなかった場合は緑）
             if (isHit) return hit.collider.gameObject;
             return null;
         }
@@ -28,7 +24,7 @@ namespace Enemy
         /// </summary>
         public Collider2D[] GetOnRangeTarget()
         {
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, rangeRadius, rangeLayerMask);
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, enemyData.rangeRadius, enemyData.rangeLayerMask);
             return colliders;
         }
 
@@ -44,7 +40,7 @@ namespace Enemy
         {
             // ターゲットを取得する範囲を可視化
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position, rangeRadius);
+            Gizmos.DrawWireSphere(transform.position, enemyData.rangeRadius);
         }
     }
 }

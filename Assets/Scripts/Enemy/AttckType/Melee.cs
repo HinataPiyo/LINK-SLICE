@@ -12,7 +12,7 @@ namespace Enemy
         /// </summary>
         public override void OnAction(IDamageable target)
         {
-            target.ApplyDamage(strength);      // ダメージを与える
+            target.ApplyDamage(enemyData.strength);      // ダメージを与える
         }
     }
 }

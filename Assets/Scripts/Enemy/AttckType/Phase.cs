@@ -7,12 +7,10 @@ namespace Enemy
     /// </summary>
     public class Phase : Melee
     {
+        [SerializeField] PhaseEnemyData phaseData;
         SpriteRenderer spriteRenderer;
         EnemyController ctrl;
         bool isPhase = false;
-
-        [SerializeField] float moveSpeedInPhase = 1f;    // フェーズ中の移動速度
-        [SerializeField] float moveSpeedOutPhase = 3f;    // フェーズ外の移動速度
 
         void Awake()
         {
@@ -47,14 +45,14 @@ namespace Enemy
             if (isPhase)
             {
                 // フェーズに入る前の処理
-                ctrl.Movement.SetMoveSpeed(moveSpeedInPhase);
+                ctrl.Movement.SetMoveSpeed(phaseData.moveSpeedInPhase);
                 gameObject.layer = LayerMask.NameToLayer(GlobalCommon.LAYER_INVISIBLE);    // レイヤーを変更して攻撃が通らないようにする
                 spriteRenderer.color = new Color(1f, 1f, 1f, 0.2f);    // 半透明にする
             }
             else
             {
                 // フェーズに入る前の処理
-                ctrl.Movement.SetMoveSpeed(moveSpeedOutPhase);
+                ctrl.Movement.SetMoveSpeed(phaseData.moveSpeedOutPhase);
                 gameObject.layer = LayerMask.NameToLayer(GlobalCommon.LAYER_ENEMY);    // レイヤーを変更して攻撃が通らないようにする
                 spriteRenderer.color = new Color(1f, 1f, 1f, 1f);    // 元の色に戻す
             }

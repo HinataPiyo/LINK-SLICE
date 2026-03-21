@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 024afaf90bc50b64aab26adf175bec26, type: 3}
+  m_Name: EnemyData_Phase
+  m_EditorClassIdentifier: 
+  enemyType: 3
+  dieEffectPrefab: {fileID: 4707742459236616872, guid: f1a0bc9fbbfb6934585edc984db337fd, type: 3}
+  strength: 3
+  attackRate: 1
+  maxHealth: 5
+  moveSpeed: 0
+  rangeRadius: 2
+  rangeLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  rayDistance: 1
+  rayLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  defaultSwarmFollowDistance: 0.6
+  moveSpeedInPhase: 1
+  moveSpeedOutPhase: 3

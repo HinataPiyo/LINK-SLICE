@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 1040722651145013052, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: d7963f4789de65d4abb6f0d7d9487f4c, type: 2}
+      objectReference: {fileID: 2100000, guid: 87bad40579059a14eb35591a1a5e312e, type: 2}
     - target: {fileID: 1840364896727108822, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7679234725115218961, guid: b3dda94abc459444d8808f91499e89b4, type: 3}
       propertyPath: m_Name
-      value: Enemy_Armor_DieEffect
+      value: Enemy_Square_Melee_Armor_DieEffect
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
