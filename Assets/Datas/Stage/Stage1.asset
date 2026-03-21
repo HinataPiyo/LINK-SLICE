@@ -14,11 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - compositions:
-    - enemyType: 2
-      spawnPattern: 2
-      spawnCount: 10
-      spawnInterval: 1
-    - enemyType: 0
+    - enemyType: 3
       spawnPattern: 0
       spawnCount: 1
-      spawnInterval: 0.25
+      spawnInterval: 1

@@ -1,0 +1,144 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &431429709719965710
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3218074460964751067, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 336149689
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3431969553203435421, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286805413600464675, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
+    - target: {fileID: 5286805413600464675, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 503220b87ed56e744989d8c8c5ea50ab, type: 2}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: dieEffectPrefab
+      value: 
+      objectReference: {fileID: 4707742459236616872, guid: f1a0bc9fbbfb6934585edc984db337fd, type: 3}
+    - target: {fileID: 5384288776415118917, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: defaultMaxHealth
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7672586213973651085, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_Name
+      value: Rhombus
+      objectReference: {fileID: 0}
+    - target: {fileID: 7788562759638999410, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.92387956
+      objectReference: {fileID: 0}
+    - target: {fileID: 7788562759638999410, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7788562759638999410, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7788562759638999410, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.38268343
+      objectReference: {fileID: 0}
+    - target: {fileID: 7788562759638999410, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: m_Name
+      value: Enemy_Rhombus_Phase
+      objectReference: {fileID: 0}
+    - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: rangeRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8401947634918144102, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      propertyPath: rangeLayerMask.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3912938566830742281}
+  m_SourcePrefab: {fileID: 100100000, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+--- !u!1 &8630458337835047848 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8230666044413299622, guid: dafc5a32e85025d4db85bf35cc757c35, type: 3}
+  m_PrefabInstance: {fileID: 431429709719965710}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3912938566830742281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8630458337835047848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cadb6123b9b4d545ac4d3117ed35383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  strength: 1
+  attackRate: 1
+  moveSpeedInPhase: 1
+  moveSpeedOutPhase: 3

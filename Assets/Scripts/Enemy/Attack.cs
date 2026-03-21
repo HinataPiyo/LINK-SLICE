@@ -30,6 +30,8 @@ namespace Enemy
 
         void Update()
         {
+            UpdateOverridden();
+            
             if(!IsAtatcking) return;                // 攻撃していない場合は、以降の処理をスキップ
             if(damageableTarget == null) return;    // ダメージを与える対象がいない場合は、以降の処理をスキップ
 
@@ -41,6 +43,7 @@ namespace Enemy
             }
         }
 
+        protected virtual void UpdateOverridden() { }    // 派生クラスで必要に応じてUpdateをオーバーライドできるようにする
         public abstract void OnAction(IDamageable target);    // 攻撃のアクションを定義する抽象メソッド
 
         /// <summary>
